@@ -14,7 +14,7 @@ class MatchMenuSectionCell: UITableViewCell {
         removeTeamSectionViewsFromSuperView()
         removeChatSectionViewsFromSuperView()
         removeMediaSectionViewsFromSuperView()
-
+        
         addSubview(firstTeamLabel)
         addSubview(middleLabel)
         addSubview(secondTeamLabel)
@@ -66,6 +66,7 @@ class MatchMenuSectionCell: UITableViewCell {
     }()
     
     func setupTeamSectionViews(isFirstCell: Bool) {
+        self.layoutMargins=UIEdgeInsetsMake(10, 10, 10, 10)
         removeChatSectionViewsFromSuperView()
         removeReviewSectionViewsFromSuperView()
         removeMediaSectionViewsFromSuperView()
@@ -132,6 +133,7 @@ class MatchMenuSectionCell: UITableViewCell {
         return label
     }()
     
+    var isVideo=false
     func setupMediaSectionViews() {
         removeReviewSectionViewsFromSuperView()
         removeTeamSectionViewsFromSuperView()
@@ -140,8 +142,14 @@ class MatchMenuSectionCell: UITableViewCell {
         backgroundColor = .clear
         
         addSubview(mediaImageView)
+        addSubview(filterImageView)
+        filterImageView.anchorToTop(mediaImageView.topAnchor, left: mediaImageView.leftAnchor, bottom: mediaImageView.bottomAnchor, right: mediaImageView.rightAnchor)
         
-        addConstraintsWithFormat(format: "H:|[v0]|", views: mediaImageView)
+        addSubview(playerImageView)
+        playerImageView.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
+        playerImageView.anchorWithConstantsToTop(self.topAnchor, left: nil, bottom: nil, right: nil, topConstant: 59, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
+        
+        addConstraintsWithFormat(format: "H:|-10-[v0]-10-|", views: mediaImageView)
         addConstraintsWithFormat(format: "V:|-6-[v0(180)]-6-|", views: mediaImageView)
         
     }
@@ -151,6 +159,25 @@ class MatchMenuSectionCell: UITableViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.backgroundColor = .red
         imageView.clipsToBounds = true
+        return imageView
+    }()
+    
+    let filterImageView:UIImageView={
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.image=#imageLiteral(resourceName: "filtre")
+        imageView.clipsToBounds = true
+        return imageView
+    }()
+    
+    let playerImageView:UIImageView={
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.image=#imageLiteral(resourceName: "video")
+        imageView.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        imageView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        imageView.clipsToBounds = true
+        imageView.isHidden=true
         return imageView
     }()
     
@@ -193,6 +220,8 @@ class MatchMenuSectionCell: UITableViewCell {
     
     func removeMediaSectionViewsFromSuperView() {
         mediaImageView.removeFromSuperview()
+        filterImageView.removeFromSuperview()
+        playerImageView.removeFromSuperview()
     }
     
     func removeChatSectionViewsFromSuperView()  {

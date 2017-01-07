@@ -295,36 +295,14 @@ class MatchMenuCell: UICollectionViewCell, UITableViewDataSource, UITableViewDel
             case 2:
                 cell.setupMediaSectionViews()
                 
-                let filterImageView = UIImageView()
-                filterImageView.image = UIImage(named: "filtre")
-                
-                let playerImageView = UIImageView()
-                playerImageView.widthAnchor.constraint(equalToConstant: 50).isActive = true
-                playerImageView.heightAnchor.constraint(equalToConstant: 50).isActive = true
-                
-                
                 if row >= 0 && row < mediaList["photos"].count {
                     let url = URL(string: mediaList["photos"][row]["thumb"].string!)
                     cell.mediaImageView.kf.setImage(with: url)
-                    
-                    //playerImageView.image = UIImage()
                 }
                 else {
                     let videoIndex = mediaList["photos"].count
-                    
                     let url = URL(string: mediaList["videos"][row - videoIndex]["thumb"].string!)
                     cell.mediaImageView.kf.setImage(with: url)
-                    
-                    playerImageView.image = UIImage(named: "video")
-                    
-                    cell.addSubview(filterImageView)
-                    filterImageView.anchorToTop(cell.mediaImageView.topAnchor, left: cell.mediaImageView.leftAnchor, bottom: cell.mediaImageView.bottomAnchor, right: cell.mediaImageView.rightAnchor)
-                    
-                    cell.addSubview(playerImageView)
-                    
-                    playerImageView.centerXAnchor.constraint(equalTo: cell.centerXAnchor).isActive = true
-                    
-                    playerImageView.anchorWithConstantsToTop(cell.topAnchor, left: nil, bottom: nil, right: nil, topConstant: 59, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
                 }
                 
                 break

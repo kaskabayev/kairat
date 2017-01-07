@@ -13,7 +13,7 @@ class SlideViewController: SlideMenuController,SlideMenuControllerDelegate{
     var blur:UIBlurEffect?
     let blurView = UIVisualEffectView()
     override func awakeFromNib() {
-        if let controller = self.storyboard?.instantiateViewController(withIdentifier: "Statistic") {
+        if let controller = self.storyboard?.instantiateViewController(withIdentifier: "News") {
             self.mainViewController = controller
         }
         if let controller = self.storyboard?.instantiateViewController(withIdentifier: "Menu") {
@@ -22,6 +22,8 @@ class SlideViewController: SlideMenuController,SlideMenuControllerDelegate{
         SlideMenuOptions.leftViewWidth=UIScreen.main.bounds.width*2/3
         SlideMenuOptions.hideStatusBar=false
         SlideMenuOptions.contentViewScale=1
+        self.leftPanGesture?.isEnabled = false
+        self.removeLeftGestures()
         super.awakeFromNib()
     }
     
@@ -34,12 +36,12 @@ class SlideViewController: SlideMenuController,SlideMenuControllerDelegate{
         
         blur=UIBlurEffect(style: .light)
         blurView.effect=blur
-        blurView.alpha=0.95
+        blurView.alpha=0.987
         self.slideMenuController()?.delegate=self
     }
     
     func leftWillClose() {
-        UIView.animate(withDuration: 1) {
+        UIView.animate(withDuration: 0.3) {
             self.blurView.removeFromSuperview()
         }
     }

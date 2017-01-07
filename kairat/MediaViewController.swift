@@ -18,8 +18,6 @@ class MediaViewController: UIViewController {
     
     @IBOutlet weak var menu: UIBarButtonItem!
     @IBOutlet weak var fon: UIImageView!
-    var blur:UIBlurEffect?
-    let blurView = UIVisualEffectView()
     @IBOutlet weak var header: UIView!
     @IBOutlet weak var collection: UICollectionView!
     
@@ -79,15 +77,7 @@ class MediaViewController: UIViewController {
         self.title="МЕДИА"
         self.navigationController?.setBG()
         view.backgroundColor=UIColor(colorLiteralRed: 0, green: 0, blue: 19/255, alpha: 1)
-        
-        blur=UIBlurEffect(style: .light)
-        blurView.effect=blur
-        self.blurView.frame = fon.bounds
-        self.blurView.alpha=0.8
-        self.blurView.translatesAutoresizingMaskIntoConstraints=false
-        self.view.insertSubview(blurView, belowSubview: header)
-        blurView.anchorWithConstantsToTop(top: self.fon.topAnchor, left: self.view.leftAnchor, bottom: self.view.bottomAnchor, right: self.view.rightAnchor , topConstant: (self.navigationController?.navigationBar.frame.height)!+header.frame.height, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
-        
+        fon.image=#imageLiteral(resourceName: "fon").imageByCroppingImage(size: CGSize(width: 1200, height: 1200))
         header.translatesAutoresizingMaskIntoConstraints=false
         header.anchorWithConstantsToTop(self.view.topAnchor, left: self.view.leftAnchor, bottom: nil, right: self.view.rightAnchor, topConstant: 20+(navigationController?.navigationBar.bounds.size.height)!, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
         header.heightAnchor.constraint(equalToConstant: 50).isActive=true

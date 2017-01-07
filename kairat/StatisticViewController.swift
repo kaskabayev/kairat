@@ -27,6 +27,7 @@ class StatisticViewController: UIViewController {
     
     
     @IBOutlet weak var menu: UIBarButtonItem!
+    @IBOutlet weak var fon: UIImageView!
     @IBOutlet weak var table: UITableView!
     @IBOutlet weak var collection: UICollectionView!
     @IBOutlet weak var seasonBtn: UIButton!
@@ -66,7 +67,7 @@ class StatisticViewController: UIViewController {
         self.title="ТАБЛИЦА"
         self.navigationController?.setBG()
         self.view.backgroundColor=UIColor(colorLiteralRed: 0, green: 0, blue: 19/255, alpha: 1)
-        
+        fon.image=#imageLiteral(resourceName: "fon").imageByCroppingImage(size: CGSize(width: 1200, height: 1200))
         refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(loadData), for: .valueChanged)
         seasonBtn.addTarget(self, action: #selector(showPicker), for: .touchUpInside)

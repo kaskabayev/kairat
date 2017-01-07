@@ -72,7 +72,7 @@ class ClubHeader: UITableViewHeaderFooterView, UICollectionViewDataSource, UICol
     
     static func setupCVButtons(title: String, tag: Int) -> UIButton {
         let button = UIButton()
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 13.5)
+        button.titleLabel?.font = UIFont(name: "Century Gothic", size: 13)
         button.setTitleColor(.white, for: .normal)
         button.setTitle(title, for: .normal)
         button.backgroundColor = .clear

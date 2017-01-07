@@ -12,7 +12,10 @@ class ClubMenuSectionCell: UICollectionViewCell {
     
     let imageView: UIImageView = {
         let iv = UIImageView()
+        iv.contentMode = .scaleAspectFill
+        iv.heightAnchor.constraint(equalToConstant: 300).isActive=true
         iv.backgroundColor = .lightGray
+        iv.clipsToBounds=true
         return iv
     }()
     

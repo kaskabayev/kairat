@@ -17,8 +17,6 @@ class NewsViewController: UIViewController {
     var page=0
     let limit=5
     @IBOutlet weak var fon: UIImageView!
-    var blur:UIBlurEffect?
-    let blurView = UIVisualEffectView()
     
     @IBOutlet weak var newsTable: UITableView!
     var refreshControl: UIRefreshControl!
@@ -52,15 +50,7 @@ class NewsViewController: UIViewController {
         }
         self.navigationController?.setBG()
         self.view.backgroundColor=UIColor(colorLiteralRed: 0, green: 0, blue: 19/255, alpha: 1)
-        
-        blur=UIBlurEffect(style: .light)
-        blurView.effect=blur
-        self.blurView.frame = fon.bounds
-        self.blurView.alpha=0.8
-        self.blurView.translatesAutoresizingMaskIntoConstraints=false
-        self.view.insertSubview(blurView, belowSubview: newsTable)
-        blurView.anchorWithConstantsToTop(top: self.fon.topAnchor, left: self.view.leftAnchor, bottom: self.view.bottomAnchor, right: self.view.rightAnchor , topConstant: (self.navigationController?.navigationBar.frame.height)!, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
-        
+        fon.image=#imageLiteral(resourceName: "fon").imageByCroppingImage(size: CGSize(width: 1200, height: 1200))
         
         refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(loadData), for: .valueChanged)

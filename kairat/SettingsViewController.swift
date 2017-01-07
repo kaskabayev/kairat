@@ -17,6 +17,7 @@ class SettingsViewController: UIViewController {
         self.title="НАСТРОЙКИ"
         self.navigationController?.setBG()
         view.backgroundColor=UIColor(colorLiteralRed: 0, green: 0, blue: 19/255, alpha: 1)
+        fon.image=#imageLiteral(resourceName: "Kaitrat").imageByCroppingImage(size: CGSize(width: 1000, height: 1000))
         table.alwaysBounceVertical=false
         table.backgroundColor=UIColor.clear
         table.tableFooterView=UIView()
@@ -71,9 +72,16 @@ extension SettingsViewController:UITableViewDataSource{
             cell.imageView?.image=#imageLiteral(resourceName: "settings_star")
             cell.textLabel?.text="Оцените приложение"
             let fullString = NSMutableAttributedString(string: "")
-            for _ in 1...5{
+            for _ in 1...3{
                 let image1Attachment = NSTextAttachment()
-                image1Attachment.image = #imageLiteral(resourceName: "favs")
+                image1Attachment.image = #imageLiteral(resourceName: "ratingstar")
+                image1Attachment.bounds=CGRect(x: 0, y: -5, width: 15, height: 15)
+                let image1String = NSAttributedString(attachment: image1Attachment)
+                fullString.append(image1String)
+            }
+            for _ in 1...2{
+                let image1Attachment = NSTextAttachment()
+                image1Attachment.image = #imageLiteral(resourceName: "ratingstar_active")
                 image1Attachment.bounds=CGRect(x: 0, y: -5, width: 15, height: 15)
                 let image1String = NSAttributedString(attachment: image1Attachment)
                 fullString.append(image1String)
