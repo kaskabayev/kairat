@@ -9,6 +9,31 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>Bolts.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>FBSDKCoreKit.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>FBSDKLoginKit.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>FBSDKShareKit.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>INSNibLoading.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>INSPhotoGallery-INSPhotoGallery.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -34,35 +59,70 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>SwiftyVK.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>0FA17EA0843BE281A2FE8696971CC6F9</key>
+		<key>160F3D2B181465FD6DEC4E9916DF2092</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>1DE93A359FA21F91DFBE81309E851A4A</key>
+		<key>40BDD2024CB49550E1B3655E024A7196</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>22B791967D3052626446503D1E993B30</key>
+		<key>44CAD6CE523055ED339E87154473A254</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>79C040AFDDCE1BCBF6D8B5EB0B85887F</key>
+		<key>5AB2AFB1E6DC8D2967EF130A030AD1B8</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>A21582AF2636CB4516F8D14261797A40</key>
+		<key>876A456D7926F6B8C6A0D203786B88BE</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>C1DFF2E7BBBC90737F782D7610021B4F</key>
+		<key>88E9EC28B8B46C3631E6B242B50F4442</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>BC5000D645EEAF961C85907CDC796FE1</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>BEF7E6E85DB5CDE5D7A18F4F2EB8494B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>C23991D1F4A041A8CA0A870066039D04</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>C4944FEC314D1A66588651D006273ADE</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>CEA81FA026D2CEED68F787F21B66BE1F</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>E396A93E4C79B22B7816E9F02F62ECED</key>
 		<dict>
 			<key>primary</key>
 			<true/>

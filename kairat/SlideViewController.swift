@@ -19,7 +19,7 @@ class SlideViewController: SlideMenuController,SlideMenuControllerDelegate{
         if let controller = self.storyboard?.instantiateViewController(withIdentifier: "Menu") {
             self.leftViewController = controller
         }
-        SlideMenuOptions.leftViewWidth=UIScreen.main.bounds.width*2/3
+        SlideMenuOptions.leftViewWidth=UIScreen.main.bounds.width*3/4
         SlideMenuOptions.hideStatusBar=false
         SlideMenuOptions.contentViewScale=1
         self.leftPanGesture?.isEnabled = false
@@ -45,9 +45,15 @@ class SlideViewController: SlideMenuController,SlideMenuControllerDelegate{
             self.blurView.removeFromSuperview()
         }
     }
+    func leftDidClose() {
+        UIView.animate(withDuration: 0.3) {
+            self.blurView.removeFromSuperview()
+        }
+    }
     
     func leftWillOpen() {
         if let main=self.mainViewController{
+            self.blurView.removeFromSuperview()
             UIView.animate(withDuration: 0.3) {
                 self.blurView.frame = main.view.bounds
                 self.blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -56,6 +62,16 @@ class SlideViewController: SlideMenuController,SlideMenuControllerDelegate{
         }
     }
     
+    func leftDidOpen() {
+        if let main=self.mainViewController{
+            self.blurView.removeFromSuperview()
+            UIView.animate(withDuration: 0.3) {
+                self.blurView.frame = main.view.bounds
+                self.blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                main.view.addSubview(self.blurView)
+            }
+        }
+    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.

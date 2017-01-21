@@ -10,14 +10,15 @@ import UIKit
 import SwiftyJSON
 import WebKit
 
-class NewsDetailViewController: UIViewController,UIWebViewDelegate {
+class NewsDetailViewController: UIViewController,UIWebViewDelegate,UIScrollViewDelegate {
     
     var id="201"
     var message=JSON.null
     @IBOutlet weak var fon: UIImageView!
-    var blur:UIBlurEffect?
-    let blurView = UIVisualEffectView()
     @IBOutlet weak var webView: UIWebView!
+    @IBOutlet weak var gradient: UIImageView!
+    @IBOutlet weak var top: NSLayoutConstraint!
+    @IBOutlet weak var gr_top: NSLayoutConstraint!
     @IBOutlet weak var commentTxt: UILabel!
     @IBOutlet var showComment: UITapGestureRecognizer!
     var loadingView:UIView={
@@ -38,56 +39,71 @@ class NewsDetailViewController: UIViewController,UIWebViewDelegate {
     }()
     
     let loveBtn=UIBarButtonItem()
-    @IBOutlet weak var shareBtn: UIBarButtonItem!
+    let shareBtn=UIBarButtonItem()
+    // @IBOutlet weak var shareBtn: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         loadData()
+        
+        self.title="НОВОСТИ"
+        self.navigationController?.navigationBar.titleTextAttributes = [ NSForegroundColorAttributeName: UIColor.white,NSFontAttributeName: UIFont(name: "CenturyGothic-Bold", size: 24)!]
+        
+        let sBtn = UIButton()
+        sBtn.setImage(#imageLiteral(resourceName: "zakladka"), for: .normal)
+        sBtn.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+        sBtn.addTarget(self, action: #selector(share(_:)), for: .touchUpInside)
+        shareBtn.customView=sBtn
+        
         switch selectedIndex {
         case 0:
-            self.title="НОВОСТИ"
             let lBtn = UIButton()
-            lBtn.setImage(#imageLiteral(resourceName: "favs"), for: .normal)
-            lBtn.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+            lBtn.setImage(#imageLiteral(resourceName: "zakladka"), for: .normal)
+            lBtn.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
             lBtn.addTarget(self, action: #selector(addLove), for: .touchUpInside)
             loveBtn.customView=lBtn
-            self.navigationItem.setRightBarButtonItems([loveBtn,shareBtn], animated: false)
+            self.navigationItem.setRightBarButtonItems([loveBtn], animated: false)
             break
         case 5:
             self.title="ИЗБРАННОЕ"
             let lBtn = UIButton()
-            lBtn.setImage(#imageLiteral(resourceName: "favs_active"), for: .normal)
-            lBtn.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+            lBtn.setImage(#imageLiteral(resourceName: "zakladka_active"), for: .normal)
+            lBtn.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
             lBtn.addTarget(self, action: #selector(removeLove), for: .touchUpInside)
             loveBtn.customView=lBtn
-            self.navigationItem.setRightBarButtonItems([loveBtn,shareBtn], animated: false)
+            self.navigationItem.setRightBarButtonItems([loveBtn], animated: false)
             break
         default:
             break
         }
         self.navigationController?.setBG()
-        
+        fon.image=#imageLiteral(resourceName: "fon").imageByCroppingImage(size: CGSize(width: 1200, height: 1200))
         showComment.addTarget(self, action: #selector(showCom))
         view.backgroundColor=UIColor(colorLiteralRed: 0, green: 0, blue: 19/255, alpha: 1)
-        
-        blur=UIBlurEffect(style: .light)
-        blurView.effect=blur
-        self.blurView.frame = fon.bounds
-        self.blurView.alpha=0.8
-        self.blurView.translatesAutoresizingMaskIntoConstraints=false
-        self.view.insertSubview(blurView, belowSubview: webView)
-        blurView.anchorWithConstantsToTop(top: self.fon.topAnchor, left: self.view.leftAnchor, bottom: self.view.bottomAnchor, right: self.view.rightAnchor , topConstant: (self.navigationController?.navigationBar.frame.height)!, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
-        
         webView.translatesAutoresizingMaskIntoConstraints=false
-        webView.anchorWithConstantsToTop(self.view.topAnchor, left: self.view.leftAnchor, bottom: self.view.bottomAnchor, right: self.view.rightAnchor, topConstant: 30+(navigationController?.navigationBar.bounds.size.height)!, leftConstant: 5, bottomConstant: 60, rightConstant: 5)
+        webView.anchorWithConstantsToTop(self.view.topAnchor, left: self.view.leftAnchor, bottom: self.view.bottomAnchor, right: self.view.rightAnchor, topConstant:(navigationController?.navigationBar.bounds.size.height)!, leftConstant: 5, bottomConstant: 60, rightConstant: 5)
         webView.isOpaque=false
         webView.backgroundColor=UIColor.clear
         webView.delegate=self
+        webView.scrollView.delegate=self
+        webView.scrollView.showsVerticalScrollIndicator=false
+        webView.scrollView.showsHorizontalScrollIndicator=false
+        gradient.isHidden=true
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let y=scrollView.contentOffset.y
+        if y>10{
+            self.navigationController?.setBG2()
+        }else{
+            self.navigationController?.setBG()
+        }
+        gr_top.constant=10-y
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -101,6 +117,10 @@ class NewsDetailViewController: UIViewController,UIWebViewDelegate {
                 dc.id=id
             }
         }
+    }
+    
+    func back(){
+        self.navigationController?.popViewController(animated: true)
     }
     
     func addLove(){
@@ -128,7 +148,11 @@ class NewsDetailViewController: UIViewController,UIWebViewDelegate {
         }else{
             let data=message.rawString(.utf8, options: .prettyPrinted)!
             if let id=message["id"].string{
-                UserDefaults.standard.setNewFav(data, key: id)
+                let cancel=UIAlertAction(title: "Закрыть", style: .destructive){
+                    (result:UIAlertAction)->Void in
+                    UserDefaults.standard.setNewFav(data, key: id)
+                }
+                self.showAlert(msg: "Пост добавлен в избранные", actions: [cancel])
             }
         }
     }
@@ -163,7 +187,7 @@ class NewsDetailViewController: UIViewController,UIWebViewDelegate {
         }
     }
     
-    @IBAction func share(_ sender: Any) {
+    func share(_ sender: Any) {
         if let msg=message["anons"].string{
             let activityViewController = UIActivityViewController(activityItems: [msg], applicationActivities: nil)
             activityViewController.excludedActivityTypes = [UIActivityType.mail]
@@ -182,26 +206,39 @@ class NewsDetailViewController: UIViewController,UIWebViewDelegate {
             response in
             if response != nil{
                 self.message=response
-                var mainDiv="<html>\n <head>\n <style type=\"text/css\">\n body {font-size: 10px; color:black;padding:5px;background-color: transparent;}\n p>img {width:100%;max-width:\(UIScreen.main.bounds.width-70)px;max-height:150px;}\n p{padding:0 10px}\n h2{color:black;padding:0 10px;}\n.mTop_0{margin-top:-5px;padding-top:10px;padding-bottom:10px;}\n .date{color:white;font-size: 15px;position:absolute;left:10px;bottom:5px}\n.tags{margin-left:10px;margin-top:2px;line-height: 1.8; word-wrap: normal; display: inline-block;padding:2px 5px;border-style:solid;border-width:1px;border-color:gray;color:gray;}\n img.titleImg{width:100%;}\n</style>\n </head>\n<body>"
+                var mainDiv="<html>\n <head>\n <style type=\"text/css\">\n body {font-size: 16px; color:black;padding:0 5px;background-color: transparent;font-family:'OpenSans'}\n img {width:100%;max-height:\((UIScreen.main.bounds.width-70)*2)px;}\n p{padding:0 10px}\n .h2{color:black;padding:0 10px;font-size:20px;font-family:'CenturyGothic-Bold'}\n.mTop_0{margin-top:-20px;padding-top:0;padding-bottom:10px;}\n .date{color:white;font-size: 15px;position:absolute;left:10px;bottom:5px;font-family:'CenturyGothic';font-size:16px;}\n.tags{margin-left:10px;margin-top:2px;line-height: 1.8; word-wrap: normal; display: inline-block;padding:2px 5px;border-style:solid;border-width:1px;border-color:gray;color:gray;}\n img.titleImg{width:100%;height:200px}\n.content{font-family:'OpenSans-Light';font-size:16px;}\n header{background-color:transparent;height:30px;}\n iframe{width:100%;max-height:\((UIScreen.main.bounds.width-70)*2)px;}\n</style>\n</head>\n<body>"
+                mainDiv+="<header></header>"
                 var imageDiv=""
-                if self.message["preview"] != nil{
-                    imageDiv="<div style='position:relative;'>"
-                    if let url=self.message["preview"].string{
-                        imageDiv+="<img class='titleImg' src='\(url)'/>"
+                if let preview=self.message["preview"].string{
+                    if preview.characters.count > 0{
+                        self.gradient.isHidden=false
+                        imageDiv="<div style='position:relative;'>"
+                        if let url=self.message["preview"].string{
+                            imageDiv+="<img class='titleImg' src='\(url)'/>"
+                        }
+                        if let dtime=self.message["dtime"].string{
+                            let date=Date(timeIntervalSince1970: TimeInterval.init(dtime)!)
+                            let dateFormat=DateFormatter()
+                            dateFormat.locale=Locale(identifier: "ru")
+                            dateFormat.dateFormat="d MMMM,HH:mm"
+                            let date_label:UILabel={
+                                let l=UILabel()
+                                l.textColor=UIColor.white
+                                l.text=dateFormat.string(from: date)
+                                l.font=UIFont(name: "CenturyGothic", size: 16)
+                                return l
+                            }()
+                            self.view.insertSubview(date_label, aboveSubview: self.gradient)
+                            date_label.anchorWithConstantsToTop(nil, left: self.gradient.leftAnchor, bottom: self.gradient.bottomAnchor, right: self.gradient.rightAnchor, topConstant: 0, leftConstant: 10, bottomConstant: 10, rightConstant: 10)
+                            //imageDiv+="<span class='date'>\(dateFormat.string(from: date))</span>"
+                        }
+                        imageDiv+="</div>"
                     }
-                    if let dtime=self.message["dtime"].string{
-                        let date=Date(timeIntervalSince1970: TimeInterval.init(dtime)!)
-                        let dateFormat=DateFormatter()
-                        dateFormat.locale=Locale(identifier: "ru")
-                        dateFormat.dateFormat="d MMMM,HH:mm"
-                        imageDiv+="<span class='date'>\(dateFormat.string(from: date))</span>"
-                    }
-                    imageDiv+="</div>"
                 }
                 var contentDiv=""
                 if let title=self.message["title"].string{
                     contentDiv="<div class='mTop_0' style='background-color: white;'>"
-                    contentDiv+="<h2>\(title)</h2>"
+                    contentDiv+="<p class='h2'>\(title)</p>"
                 }
                 if self.message["tags"].array?.isEmpty==false{
                     if let tags=self.message["tags"].arrayObject as? [String]{
@@ -211,7 +248,7 @@ class NewsDetailViewController: UIViewController,UIWebViewDelegate {
                     }
                 }
                 if let content=self.message["content"].string{
-                    contentDiv+=content
+                    contentDiv+="<div class='content'>\(content)</div>"
                 }
                 if let author=self.message["author"]["name"].string{
                     contentDiv+="<span style='padding:0 10px;'>\(author)</span>"
@@ -228,13 +265,55 @@ class NewsDetailViewController: UIViewController,UIWebViewDelegate {
                     image1Attachment.bounds=CGRect(x: 0, y: -5, width: 15, height: 15)
                     let image1String = NSAttributedString(attachment: image1Attachment)
                     fullString.append(image1String)
-                    fullString.append(NSAttributedString(string: " \(comment.count) комментариев"))
+                    var str=""
+                    if comment.count>0{
+                        if comment.count<10{
+                            switch comment.count{
+                            case 0:
+                                str=comment_s.d.rawValue
+                                break
+                            case 1:
+                                str=comment_s.a.rawValue
+                                break
+                            case 2...4:
+                                str=comment_s.b.rawValue
+                                break
+                            case 5...9:
+                                str=comment_s.c.rawValue
+                                break
+                            default:
+                                break
+                            }
+                        }else{
+                            switch comment.count%10{
+                            case 1:
+                                str=comment_s.a.rawValue
+                                break
+                            case 2...4:
+                                str=comment_s.b.rawValue
+                                break
+                            case 0,5...9:
+                                str=comment_s.c.rawValue
+                                break
+                            default:
+                                break
+                            }
+                        }
+                    }
+                    fullString.append(NSAttributedString(string: " \(comment.count) \(str)"))
                     self.commentTxt?.attributedText=fullString
                 }
             }else{
                 self.dismiss(animated: true, completion: nil)
             }
         }
+    }
+    
+    enum comment_s:String {
+        case a="коментарий"
+        case b="коментария"
+        case c="коментариев"
+        case d="нет коментариев"
     }
     
     func webViewDidFinishLoad(_ webView: UIWebView) {

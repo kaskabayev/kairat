@@ -7,6 +7,69 @@ let host="http://api.kairat.com/"
 
 class CustomRequests {
     
+    static func vk(view:UIViewController,loading:UIView,token:String,completionHandler: @escaping (JSON) -> ()){
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        loading.isHidden=false
+        Alamofire.request("\(host)auth/vk?access_token=\(token)").validate().responseJSON{
+            response in
+            UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            loading.isHidden=true
+            if response.result.error==nil{
+                completionHandler(JSON(response.result.value!))
+            }else{
+                let okAction = UIAlertAction(title: "Повторить", style: UIAlertActionStyle.default) { (result : UIAlertAction) -> Void in
+                    self.getClub(view: view,loading: loading,completionHandler: completionHandler)
+                }
+                let cancel=UIAlertAction(title: "Закрыть", style: .destructive){
+                    (result:UIAlertAction)->Void in
+                    
+                }
+                view.showAlert(msg: (response.result.error?.localizedDescription)!, actions: [okAction,cancel])
+            }
+        }
+    }
+    static func fb(view:UIViewController,loading:UIView,token:String,completionHandler: @escaping (JSON) -> ()){
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        loading.isHidden=false
+        Alamofire.request("\(host)auth/fb?access_token=\(token)").validate().responseJSON{
+            response in
+            UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            loading.isHidden=true
+            if response.result.error==nil{
+                completionHandler(JSON(response.result.value!))
+            }else{
+                let okAction = UIAlertAction(title: "Повторить", style: UIAlertActionStyle.default) { (result : UIAlertAction) -> Void in
+                    self.getClub(view: view,loading: loading,completionHandler: completionHandler)
+                }
+                let cancel=UIAlertAction(title: "Закрыть", style: .destructive){
+                    (result:UIAlertAction)->Void in
+                    
+                }
+                view.showAlert(msg: (response.result.error?.localizedDescription)!, actions: [okAction,cancel])
+            }
+        }
+    }
+    static func refresh(view:UIViewController,loading:UIView,token:String,completionHandler: @escaping (JSON) -> ()){
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        loading.isHidden=false
+        Alamofire.request("\(host)auth/refresh?refresh_token=\(token)").validate().responseJSON{
+            response in
+            UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            loading.isHidden=true
+            if response.result.error==nil{
+                completionHandler(JSON(response.result.value!))
+            }else{
+                let okAction = UIAlertAction(title: "Повторить", style: UIAlertActionStyle.default) { (result : UIAlertAction) -> Void in
+                    self.getClub(view: view,loading: loading,completionHandler: completionHandler)
+                }
+                let cancel=UIAlertAction(title: "Закрыть", style: .destructive){
+                    (result:UIAlertAction)->Void in
+                    
+                }
+                view.showAlert(msg: (response.result.error?.localizedDescription)!, actions: [okAction,cancel])
+            }
+        }
+    }
     static func getGames(view:UIViewController,loading:UIView,id:String,completionHandler: @escaping (JSON) -> ()){
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
         loading.isHidden=false
@@ -27,7 +90,6 @@ class CustomRequests {
                 view.showAlert(msg: (response.result.error?.localizedDescription)!, actions: [okAction,cancel])
             }
         }
-        
     }
     static func getGames(view:UIViewController,loading:UIView,data:String?,completionHandler: @escaping (JSON) -> ()){
         UIApplication.shared.isNetworkActivityIndicatorVisible = true

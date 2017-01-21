@@ -18,7 +18,7 @@ class HistoryDetailViewController: UIViewController,UITableViewDelegate,UITableV
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        navigationController?.setBG()
         let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height))
         titleLabel.text = "ИСТОРИЯ"
         titleLabel.textColor = .white

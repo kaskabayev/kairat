@@ -15,8 +15,6 @@ class NewsCommentViewController: UIViewController,UITextFieldDelegate {
     var message=JSON.null
     var id=""
     @IBOutlet weak var fon: UIImageView!
-    var blur:UIBlurEffect?
-    let blurView = UIVisualEffectView()
     @IBOutlet weak var commentTable: UITableView!
     @IBOutlet weak var addComm: UIView!
     var loadingView:UIView={
@@ -36,13 +34,18 @@ class NewsCommentViewController: UIViewController,UITextFieldDelegate {
         return l
     }()
     
-    let textField:UITextField={
-        let t=UITextField()
+    let textField:CommentTextFiled={
+        let t=CommentTextFiled()
         t.placeholder="Напишите комментарий"
         t.backgroundColor=UIColor.white
-        t.borderStyle = .roundedRect
+        t.borderStyle = .none
         t.returnKeyType = .send
         t.translatesAutoresizingMaskIntoConstraints=false
+        let attributes = [
+            NSForegroundColorAttributeName: UIColor.gray,
+            NSFontAttributeName : UIFont(name: "CenturyGothic", size: 16)!
+        ]
+        t.attributedPlaceholder = NSAttributedString(string: "Напиши комментарий", attributes:attributes)
         return t
     }()
     let toolBar:UIToolbar={
@@ -53,16 +56,17 @@ class NewsCommentViewController: UIViewController,UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title="КОММЕНТАРИИ"
+        self.navigationController?.navigationBar.titleTextAttributes = [ NSForegroundColorAttributeName: UIColor.white,NSFontAttributeName: UIFont(name: "CenturyGothic", size: 24)!]
         self.navigationController?.setBG()
+//        let backBtn=UIBarButtonItem()
+//        let bBtn = UIButton()
+//        bBtn.setImage(#imageLiteral(resourceName: "strelkaa"), for: .normal)
+//        bBtn.frame = CGRect(x: 0, y: 0, width: 10, height: 15)
+//        bBtn.addTarget(self, action: #selector(back), for: .touchUpInside)
+//        backBtn.customView=bBtn
+//        self.navigationItem.setLeftBarButtonItems([backBtn], animated: false)
         self.view.backgroundColor=UIColor(colorLiteralRed: 0, green: 0, blue: 19/255, alpha: 1)
-        blur=UIBlurEffect(style: .light)
-        blurView.effect=blur
-        self.blurView.frame = fon.bounds
-        self.blurView.alpha=0.8
-        self.blurView.translatesAutoresizingMaskIntoConstraints=false
-        self.view.insertSubview(blurView, belowSubview: commentTable)
-        blurView.anchorWithConstantsToTop(top: self.fon.topAnchor, left: self.view.leftAnchor, bottom: self.view.bottomAnchor, right: self.view.rightAnchor , topConstant: (self.navigationController?.navigationBar.frame.height)!, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
-        
+        fon.image=#imageLiteral(resourceName: "fon").imageByCroppingImage(size: CGSize(width: 1200, height: 1200))
         commentTable.translatesAutoresizingMaskIntoConstraints=false
         commentTable.anchorWithConstantsToTop(self.view.topAnchor, left: self.view.leftAnchor, bottom: self.view.bottomAnchor, right: self.view.rightAnchor, topConstant: 30+(navigationController?.navigationBar.bounds.size.height)!, leftConstant: 10, bottomConstant: 60, rightConstant: 10)
         commentTable.tableFooterView=UIView()
@@ -70,6 +74,10 @@ class NewsCommentViewController: UIViewController,UITextFieldDelegate {
         commentTable.estimatedRowHeight=100
         commentTable.rowHeight=UITableViewAutomaticDimension
         setupTextField()
+    }
+    
+    func back(){
+        self.navigationController?.popViewController(animated: true)
     }
     
     func addLove(){
@@ -105,9 +113,7 @@ class NewsCommentViewController: UIViewController,UITextFieldDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(aNotification:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
         addComm.addSubview(textField)
-        textField.centerYAnchor.constraint(equalTo: addComm.centerYAnchor).isActive=true
-        textField.leftAnchor.constraint(equalTo: addComm.leftAnchor, constant: 10).isActive=true
-        textField.rightAnchor.constraint(equalTo: addComm.rightAnchor, constant: -10).isActive=true
+        textField.anchorWithConstantsToTop(addComm.topAnchor, left: addComm.leftAnchor, bottom: addComm.bottomAnchor, right: addComm.rightAnchor, topConstant: 10, leftConstant: 10, bottomConstant: 10, rightConstant: 10)
         textField.delegate=self
     }
     
@@ -189,7 +195,8 @@ extension NewsCommentViewController:UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell=tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! NewsCommentCell
-        
+        cell.avatar.layer.cornerRadius=20
+        cell.avatar.layer.borderWidth=1
         let m=message[indexPath.row]
         if let url=m["author"]["thumb"].string{
             cell.avatar.kf.setImage(with: URL.init(string:url))
@@ -242,6 +249,7 @@ class NewsCommentCell: UITableViewCell {
         super.awakeFromNib()
         separatorInset=UIEdgeInsetsMake(0, 0, 0, 0)
         selectionStyle = .none
+        avatar.layer.cornerRadius=20
     }
     
     override func setSelected(_ selected: Bool, animated: Bool) {

@@ -20,7 +20,7 @@ protocol IndicatorDelegate {
 }
 
 class AboutClubViewController: UIViewController,IndicatorDelegate,UIWebViewDelegate {
-   
+    
     internal func reload() {
         self.isFirstLoad=false
         table.reloadData()
@@ -49,7 +49,9 @@ class AboutClubViewController: UIViewController,IndicatorDelegate,UIWebViewDeleg
     @IBOutlet weak var fon: UIImageView!
     @IBOutlet weak var table: UITableView!
     @IBOutlet weak var header_view: UIView!
+    @IBOutlet weak var header: UIView!
     @IBOutlet weak var topConstraint: NSLayoutConstraint!
+    @IBOutlet weak var header_top: NSLayoutConstraint!
     
     var message=JSON.null
     var detail_mess=JSON.null
@@ -57,7 +59,7 @@ class AboutClubViewController: UIViewController,IndicatorDelegate,UIWebViewDeleg
     var sostav_detail=JSON.null
     
     var index=0
-    var selected_team=0
+    var selected_team=2
     var isDetail=false
     var isFirstLoad=true
     
@@ -85,20 +87,31 @@ class AboutClubViewController: UIViewController,IndicatorDelegate,UIWebViewDeleg
         self.view.backgroundColor=UIColor(colorLiteralRed: 0, green: 0, blue: 16/255, alpha: 1)
         fon.image=#imageLiteral(resourceName: "Kaitrat").imageByCroppingImage(size: CGSize(width: 1000, height: 1000))
         table.backgroundColor=UIColor.clear
-        table.contentInset=UIEdgeInsetsMake(0, 0, 0, 0)
+        table.contentInset=UIEdgeInsetsMake(UIApplication.shared.statusBarFrame.height, 0, 0, 0)
         table.estimatedRowHeight=UIScreen.main.bounds.height
         table.rowHeight=UITableViewAutomaticDimension
         table.reloadData()
         setup()
         loadData()
+        setup_menu()
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    @IBAction func open(_ sender: Any) {
-        self.toggleLeft()
+    
+    let menuBtn=UIBarButtonItem()
+    func open(_ sender: Any) {
+        self.slideMenuController()?.toggleLeft()
+    }
+    func setup_menu(){
+        let lBtn = UIButton()
+        lBtn.setImage(#imageLiteral(resourceName: "menu"), for: .normal)
+        lBtn.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+        lBtn.addTarget(self, action: #selector(open), for: .touchUpInside)
+        menuBtn.customView=lBtn
+        self.navigationItem.setLeftBarButtonItems([menuBtn], animated: false)
     }
     
     func chooseTeamType() {
@@ -127,10 +140,18 @@ class AboutClubViewController: UIViewController,IndicatorDelegate,UIWebViewDeleg
         alertController.addAction(playersAction)
         alertController.addAction(cancelAction)
         
-       self.present(alertController, animated: true, completion: nil)
+        self.present(alertController, animated: true, completion: nil)
     }
     
     func loadData(){
+        btn1.isSelected=true
+        btn2.isSelected=false
+        btn3.isSelected=false
+        
+        btn1_1.isSelected=true
+        btn2_1.isSelected=false
+        btn3_1.isSelected=false
+
         view.addSubview(loadingView)
         loadingViewHeght=NSLayoutConstraint(item: loadingView, attribute:NSLayoutAttribute.height, relatedBy:NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: UIScreen.main.bounds.height)
         loadingView.addConstraint(loadingViewHeght!)
@@ -166,9 +187,9 @@ class AboutClubViewController: UIViewController,IndicatorDelegate,UIWebViewDeleg
         let b=UIButton()
         b.tag=0
         b.setTitle("ИСТОРИЯ", for: .normal)
-        b.titleLabel?.font=UIFont(name: "Century Gothic", size: 12)
+        b.titleLabel?.font=UIFont(name: "CenturyGothic-Bold", size: 12)
         b.setTitleColor(UIColor.white, for: .normal)
-        b.setTitleColor(UIColor.red, for: .selected)
+        b.setTitleColor(UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1), for: .selected)
         b.heightAnchor.constraint(equalToConstant: 40).isActive=true
         b.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width/3).isActive=true
         b.translatesAutoresizingMaskIntoConstraints=false
@@ -178,9 +199,9 @@ class AboutClubViewController: UIViewController,IndicatorDelegate,UIWebViewDeleg
         let b=UIButton()
         b.tag=1
         b.setTitle("ДОСТИЖЕНИЯ", for: .normal)
-        b.titleLabel?.font=UIFont(name: "Century Gothic", size: 12)
+        b.titleLabel?.font=UIFont(name: "CenturyGothic-Bold", size: 12)
         b.setTitleColor(UIColor.white, for: .normal)
-        b.setTitleColor(UIColor.red, for: .selected)
+        b.setTitleColor(UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1), for: .selected)
         b.heightAnchor.constraint(equalToConstant: 40).isActive=true
         b.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width/3).isActive=true
         b.translatesAutoresizingMaskIntoConstraints=false
@@ -190,9 +211,9 @@ class AboutClubViewController: UIViewController,IndicatorDelegate,UIWebViewDeleg
         let b=UIButton()
         b.tag=2
         b.setTitle("СОСТАВ", for: .normal)
-        b.titleLabel?.font=UIFont(name: "Century Gothic", size: 12)
+        b.titleLabel?.font=UIFont(name: "CenturyGothic-Bold", size: 12)
         b.setTitleColor(UIColor.white, for: .normal)
-        b.setTitleColor(UIColor.red, for: .selected)
+        b.setTitleColor(UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1), for: .selected)
         b.heightAnchor.constraint(equalToConstant: 40).isActive=true
         b.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width/3).isActive=true
         b.translatesAutoresizingMaskIntoConstraints=false
@@ -200,13 +221,62 @@ class AboutClubViewController: UIViewController,IndicatorDelegate,UIWebViewDeleg
     }()
     var indicator:UIView={
         let v=UIView()
-        v.backgroundColor=UIColor.red
+        v.backgroundColor=UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1)
         v.heightAnchor.constraint(equalToConstant: 4).isActive=true
         v.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width/3).isActive=true
         v.translatesAutoresizingMaskIntoConstraints=false
         return v
     }()
+    
+    var btn1_1:UIButton={
+        let b=UIButton()
+        b.tag=0
+        b.setTitle("ИСТОРИЯ", for: .normal)
+        b.titleLabel?.font=UIFont(name: "CenturyGothic-Bold", size: 12)
+        b.setTitleColor(UIColor.white, for: .normal)
+        b.setTitleColor(UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1), for: .selected)
+        b.heightAnchor.constraint(equalToConstant: 40).isActive=true
+        b.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width/3).isActive=true
+        b.translatesAutoresizingMaskIntoConstraints=false
+        return b
+    }()
+    var btn2_1:UIButton={
+        let b=UIButton()
+        b.tag=1
+        b.setTitle("ДОСТИЖЕНИЯ", for: .normal)
+        b.titleLabel?.font=UIFont(name: "CenturyGothic-Bold", size: 12)
+        b.setTitleColor(UIColor.white, for: .normal)
+        b.setTitleColor(UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1), for: .selected)
+        b.heightAnchor.constraint(equalToConstant: 40).isActive=true
+        b.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width/3).isActive=true
+        b.translatesAutoresizingMaskIntoConstraints=false
+        return b
+    }()
+    var btn3_1:UIButton={
+        let b=UIButton()
+        b.tag=2
+        b.setTitle("СОСТАВ", for: .normal)
+        b.titleLabel?.font=UIFont(name: "CenturyGothic-Bold", size: 12)
+        b.setTitleColor(UIColor.white, for: .normal)
+        b.setTitleColor(UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1), for: .selected)
+        b.heightAnchor.constraint(equalToConstant: 40).isActive=true
+        b.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width/3).isActive=true
+        b.translatesAutoresizingMaskIntoConstraints=false
+        return b
+    }()
+    var indicator_1:UIView={
+        let v=UIView()
+        v.backgroundColor=UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1)
+        v.heightAnchor.constraint(equalToConstant: 4).isActive=true
+        v.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width/3).isActive=true
+        v.translatesAutoresizingMaskIntoConstraints=false
+        return v
+    }()
+    
     func setup(){
+        self.header.isHidden=true
+        self.header_view.isHidden=false
+        
         btn1.addTarget(self, action: #selector(setSelected(sender:)), for: .touchUpInside)
         btn2.addTarget(self, action: #selector(setSelected(sender:)), for: .touchUpInside)
         btn3.addTarget(self, action: #selector(setSelected(sender:)), for: .touchUpInside)
@@ -215,15 +285,33 @@ class AboutClubViewController: UIViewController,IndicatorDelegate,UIWebViewDeleg
         btn2.isSelected=true
         btn3.isSelected=true
         
+        btn1_1.addTarget(self, action: #selector(setSelected(sender:)), for: .touchUpInside)
+        btn2_1.addTarget(self, action: #selector(setSelected(sender:)), for: .touchUpInside)
+        btn3_1.addTarget(self, action: #selector(setSelected(sender:)), for: .touchUpInside)
+        
+        btn1_1.isSelected=true
+        btn2_1.isSelected=true
+        btn3_1.isSelected=true
+        
         header_view.addSubview(btn1)
         header_view.addSubview(btn2)
         header_view.addSubview(btn3)
         header_view.addSubview(indicator)
         
         indicator.anchorWithConstantsToTop(nil, left: header_view.leftAnchor, bottom: header_view.bottomAnchor, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
-        btn1.anchorWithConstantsToTop(nil, left: header_view.leftAnchor, bottom: indicator.topAnchor, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 5, rightConstant: 0)
-        btn2.anchorWithConstantsToTop(nil, left: btn1.rightAnchor, bottom: indicator.topAnchor, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 5, rightConstant: 0)
-        btn3.anchorWithConstantsToTop(nil, left: btn2.rightAnchor, bottom: indicator.topAnchor, right: header_view.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 5, rightConstant: 0)
+        btn1.anchorWithConstantsToTop(nil, left: header_view.leftAnchor, bottom: indicator.topAnchor, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
+        btn2.anchorWithConstantsToTop(nil, left: btn1.rightAnchor, bottom: indicator.topAnchor, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
+        btn3.anchorWithConstantsToTop(nil, left: btn2.rightAnchor, bottom: indicator.topAnchor, right: header_view.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
+        
+        header.addSubview(btn1_1)
+        header.addSubview(btn2_1)
+        header.addSubview(btn3_1)
+        header.addSubview(indicator_1)
+        
+        indicator_1.anchorWithConstantsToTop(nil, left: header.leftAnchor, bottom: header.bottomAnchor, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
+        btn1_1.anchorWithConstantsToTop(nil, left: header.leftAnchor, bottom: indicator_1.topAnchor, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
+        btn2_1.anchorWithConstantsToTop(nil, left: btn1_1.rightAnchor, bottom: indicator_1.topAnchor, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
+        btn3_1.anchorWithConstantsToTop(nil, left: btn2_1.rightAnchor, bottom: indicator_1.topAnchor, right: header.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
         
     }
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -231,17 +319,18 @@ class AboutClubViewController: UIViewController,IndicatorDelegate,UIWebViewDeleg
         if y>150{
             UIView.animate(withDuration: 2.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
                 self.navigationController?.setBG2()
-                self.header_view.backgroundColor=UIColor.black
+                self.header.isHidden=false
+                self.header_view.isHidden=true
             }, completion: nil)
-            self.header_view.frame.origin.y=y
         }else{
             UIView.animate(withDuration: 2.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
                 self.navigationController?.setBG()
-                self.header_view.backgroundColor=UIColor.clear
+                self.header.isHidden=true
+                self.header_view.isHidden=false
             }, completion: nil)
-            let top=44+y
-            self.topConstraint.constant=0-top
         }
+        let top=44+y
+        self.topConstraint.constant=0-top
     }
     func setSelected(sender:UIButton){
         index=sender.tag
@@ -254,6 +343,12 @@ class AboutClubViewController: UIViewController,IndicatorDelegate,UIWebViewDeleg
             btn2.isSelected=false
             btn3.isSelected=false
             indicator.frame.origin.x=0
+            
+            btn1_1.isSelected=true
+            btn2_1.isSelected=false
+            btn3_1.isSelected=false
+            indicator_1.frame.origin.x=0
+            
             table.reloadData()
             break
         case 1:
@@ -261,6 +356,12 @@ class AboutClubViewController: UIViewController,IndicatorDelegate,UIWebViewDeleg
             btn2.isSelected=true
             btn3.isSelected=false
             indicator.frame.origin.x=UIScreen.main.bounds.width*1/3
+            
+            btn1_1.isSelected=false
+            btn2_1.isSelected=true
+            btn3_1.isSelected=false
+            indicator_1.frame.origin.x=UIScreen.main.bounds.width*1/3
+            
             table.reloadData()
             break
         case 2:
@@ -268,6 +369,12 @@ class AboutClubViewController: UIViewController,IndicatorDelegate,UIWebViewDeleg
             btn2.isSelected=false
             btn3.isSelected=true
             indicator.frame.origin.x=UIScreen.main.bounds.width*2/3
+            
+            btn1_1.isSelected=false
+            btn2_1.isSelected=false
+            btn3_1.isSelected=true
+            indicator_1.frame.origin.x=UIScreen.main.bounds.width*2/3
+            
             table.reloadData()
             break
         default:
@@ -312,7 +419,7 @@ extension AboutClubViewController:UITableViewDelegate,UITableViewDataSource{
                 return cell
             case 2:
                 if isDetail{
-                    self.header_view.frame.origin.y=150
+                    //self.header_view.frame.origin.y=150
                     let cell=tableView.dequeueReusableCell(withIdentifier: "detail", for: indexPath) as! SostavDetailCell
                     cell.delegate=self
                     cell.index=index
@@ -346,15 +453,12 @@ extension AboutClubViewController:UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         cell.backgroundColor=UIColor.clear
-        btn1.isSelected=true
-        btn2.isSelected=false
-        btn3.isSelected=false
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableViewAutomaticDimension
     }
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 20
+        return 10
     }
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         return UIView()
@@ -396,8 +500,8 @@ class IstoriaCell: UITableViewCell {
     var lbl:UILabel={
         let l=UILabel()
         l.numberOfLines=0
-        l.font=UIFont(name: "Century Gothic", size: 12)
-        l.textColor=UIColor.darkGray
+        l.font=UIFont(name: "OpenSans", size: 16)
+        l.textColor=UIColor(colorLiteralRed: 109/255, green: 105/255, blue: 126/255, alpha: 1)
         l.translatesAutoresizingMaskIntoConstraints=false
         return l
     }()
@@ -432,7 +536,7 @@ class IstoriaCell: UITableViewCell {
                         let title:UILabel={
                             let l=UILabel()
                             l.numberOfLines=0
-                            l.font=UIFont.boldSystemFont(ofSize: 20)
+                            l.font=UIFont(name: "CenturyGothic-Bold", size: 40)
                             l.textColor=UIColor.white
                             l.translatesAutoresizingMaskIntoConstraints=false
                             return l
@@ -440,28 +544,43 @@ class IstoriaCell: UITableViewCell {
                         let anons:UILabel={
                             let l=UILabel()
                             l.numberOfLines=0
-                            l.font=UIFont(name: "Century Gothic", size: 16)
+                            l.font=UIFont(name: "CenturyGothic", size: 20)
                             l.textColor=UIColor.white
                             l.translatesAutoresizingMaskIntoConstraints=false
                             return l
                         }()
-                        
-                        addSubview(preview)
-                        addSubview(filtre)
-                        addSubview(title)
-                        addSubview(anons)
-                        
-                        let gesture_btn:UIButton={
+                        let desc_view:UIView={
+                            let v=UIView()
+                            v.backgroundColor=UIColor.white
+                            return v
+                        }()
+                        let desc_text:UILabel={
+                            let l=UILabel()
+                            l.numberOfLines=0
+                            l.font=UIFont(name: "OpenSans", size: 16)
+                            l.textColor=UIColor(colorLiteralRed: 59/255, green: 62/255, blue: 72/255, alpha: 1)
+                            l.translatesAutoresizingMaskIntoConstraints=false
+                            return l
+                        }()
+                        let desc_img:UIImageView={
+                            let img=UIImageView()
+                            img.image=#imageLiteral(resourceName: "plus")
+                            img.contentMode = .scaleAspectFill
+                            img.heightAnchor.constraint(equalToConstant: 20).isActive=true
+                            img.widthAnchor.constraint(equalToConstant: 20).isActive=true
+                            img.clipsToBounds=true
+                            return img
+                        }()
+                        let desc_btn:UIButton={
                             let g=UIButton()
-                            g.tag=i
                             g.addTarget(self, action: #selector(tap(sender:)), for: .touchUpInside)
                             g.backgroundColor=UIColor.clear
-                            g.isUserInteractionEnabled=true
-                            g.translatesAutoresizingMaskIntoConstraints=false
+                            g.titleLabel?.textAlignment = .left
+                            g.setTitle("ЧИТАТЬ ПОЛНОСТЬЮ", for: .normal)
+                            g.titleLabel?.font=UIFont(name: "Century Gothic", size: 16)
+                            g.setTitleColor(UIColor(colorLiteralRed: 185/255, green: 186/255, blue: 189/255, alpha: 1), for: .normal)
                             return g
                         }()
-                        addSubview(gesture_btn)
-                        gesture_btn.anchorToTop(preview.topAnchor, left: preview.leftAnchor, bottom: preview.bottomAnchor, right: preview.rightAnchor)
                         
                         let m=history[i]
                         if let p=m["preview"].string{
@@ -474,18 +593,51 @@ class IstoriaCell: UITableViewCell {
                         if let a=m["anons"].string{
                             anons.text=a
                         }
+                        if let a=m["descr"].string{
+                            desc_text.text=a
+                        }
+                        
+                        addSubview(preview)
+                        addSubview(filtre)
+                        addSubview(title)
+                        addSubview(anons)
+                        
+                        desc_view.addSubview(desc_text)
+                        desc_view.addSubview(desc_img)
+                        desc_view.addSubview(desc_btn)
+                        desc_text.anchorWithConstantsToTop(desc_view.topAnchor, left: desc_view.leftAnchor, bottom: nil, right: desc_view.rightAnchor, topConstant: 10, leftConstant: 10, bottomConstant: 0, rightConstant: 10)
+                        desc_img.anchorWithConstantsToTop(desc_text.bottomAnchor, left: desc_view.leftAnchor, bottom: desc_view.bottomAnchor, right: nil, topConstant: 10, leftConstant: 10, bottomConstant: 10, rightConstant: 0)
+                        desc_btn.anchorWithConstantsToTop(desc_text.bottomAnchor, left: desc_img.rightAnchor, bottom: desc_view.bottomAnchor, right: nil, topConstant: 10, leftConstant: 5, bottomConstant: 10, rightConstant: 0)
+                        
+                        addSubview(anons)
+                        addSubview(desc_view)
+                        
+                        let gesture_btn:UIButton={
+                            let g=UIButton()
+                            g.tag=i
+                            g.addTarget(self, action: #selector(tap(sender:)), for: .touchUpInside)
+                            g.backgroundColor=UIColor.clear
+                            g.isUserInteractionEnabled=true
+                            g.translatesAutoresizingMaskIntoConstraints=false
+                            return g
+                        }()
+                        addSubview(gesture_btn)
+                        gesture_btn.anchorToTop(preview.topAnchor, left: preview.leftAnchor, bottom: desc_view.bottomAnchor, right: preview.rightAnchor)
+                        
                         if i < history.count-1{
                             preview.anchorWithConstantsToTop(top, left: lbl.leftAnchor, bottom: nil, right: lbl.rightAnchor, topConstant: 10, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
                             filtre.anchorToTop(preview.topAnchor, left: preview.leftAnchor, bottom: preview.bottomAnchor, right: preview.rightAnchor)
                             anons.anchorWithConstantsToTop(nil, left: preview.leftAnchor, bottom: preview.bottomAnchor, right: preview.rightAnchor, topConstant: 0, leftConstant: 5, bottomConstant: 5, rightConstant: 5)
                             title.anchorWithConstantsToTop(nil, left: anons.leftAnchor, bottom: anons.topAnchor, right: anons.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 5, rightConstant: 0)
-                            top=preview.bottomAnchor
+                            desc_view.anchorWithConstantsToTop(preview.bottomAnchor, left: lbl.leftAnchor, bottom: nil, right: lbl.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
+                            top=desc_view.bottomAnchor
                         }else{
-                            preview.anchorWithConstantsToTop(top, left: lbl.leftAnchor, bottom: self.bottomAnchor, right: lbl.rightAnchor, topConstant: 10, leftConstant: 0, bottomConstant: 10, rightConstant: 0)
+                            preview.anchorWithConstantsToTop(top, left: lbl.leftAnchor, bottom: nil, right: lbl.rightAnchor, topConstant: 10, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
                             filtre.anchorToTop(preview.topAnchor, left: preview.leftAnchor, bottom: preview.bottomAnchor, right: preview.rightAnchor)
                             anons.anchorWithConstantsToTop(nil, left: preview.leftAnchor, bottom: preview.bottomAnchor, right: preview.rightAnchor, topConstant: 0, leftConstant: 5, bottomConstant: 5, rightConstant: 5)
                             title.anchorWithConstantsToTop(nil, left: anons.leftAnchor, bottom: anons.topAnchor, right: anons.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 5, rightConstant: 0)
-                            top=preview.bottomAnchor
+                            desc_view.anchorWithConstantsToTop(preview.bottomAnchor, left: lbl.leftAnchor, bottom: self.bottomAnchor, right: lbl.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 10, rightConstant: 0)
+                            top=desc_view.bottomAnchor
                         }
                     }
                 }
@@ -548,6 +700,7 @@ class DostijenieCell: UITableViewCell {
                             img.contentMode = .scaleAspectFill
                             img.clipsToBounds=true
                             img.translatesAutoresizingMaskIntoConstraints=false
+                            img.kf.indicatorType = .activity
                             return img
                         }()
                         let img_2:UIImageView={
@@ -558,13 +711,14 @@ class DostijenieCell: UITableViewCell {
                             img.contentMode = .scaleAspectFill
                             img.clipsToBounds=true
                             img.translatesAutoresizingMaskIntoConstraints=false
+                            img.kf.indicatorType = .activity
                             return img
                         }()
                         let lbl_1:UILabel={
                             let l=UILabel()
                             l.numberOfLines=0
                             l.lineBreakMode = .byWordWrapping
-                            l.font=UIFont(name: "Century Gothic", size: 12)
+                            l.font=UIFont(name: "OpenSans-Bold", size: 16)
                             l.textColor=UIColor.white
                             l.textAlignment = .center
                             l.backgroundColor=UIColor(colorLiteralRed: 35/255, green: 36/255, blue: 39/255, alpha: 1)
@@ -575,7 +729,7 @@ class DostijenieCell: UITableViewCell {
                             let l=UILabel()
                             l.numberOfLines=0
                             l.lineBreakMode = .byWordWrapping
-                            l.font=UIFont(name: "Century Gothic", size: 12)
+                            l.font=UIFont(name: "OpenSans-Bold", size: 16)
                             l.textColor=UIColor.white
                             l.textAlignment = .center
                             l.backgroundColor=UIColor(colorLiteralRed: 35/255, green: 36/255, blue: 39/255, alpha: 1)
@@ -588,20 +742,26 @@ class DostijenieCell: UITableViewCell {
                         var txt_2=0
                         let index=i*2
                         
-                        
-                        
                         if i<achievements.count/2{
                             if let txt=achievements[index]["title"].string{
-                                lbl_1.text=String(txt)?.uppercased()
+                                let attributedText = NSMutableAttributedString(string: "\(txt.uppercased())\n", attributes: [NSFontAttributeName: UIFont(name: "OpenSans-Bold", size: 16)!, NSForegroundColorAttributeName: UIColor.white])
+                                if let anaons=achievements[index]["anons"].string{
+                                    attributedText.append(NSAttributedString(string: "\(anaons)", attributes: [NSFontAttributeName: UIFont(name: "OpenSans", size: 12)!, NSForegroundColorAttributeName: UIColor.lightGray]))
+                                }
+                                lbl_1.attributedText=attributedText
                                 txt_1=Int(lbl_1.sizeThatFits(CGSize(width: h, height: CGFloat.greatestFiniteMagnitude)).height)
                             }
                             if let txt=achievements[index+1]["title"].string{
-                                lbl_2.text=String(txt)?.uppercased()
+                                let attributedText = NSMutableAttributedString(string: "\(txt.uppercased())\n", attributes: [NSFontAttributeName: UIFont(name: "OpenSans-Bold", size: 16)!, NSForegroundColorAttributeName: UIColor.white])
+                                if let anaons=achievements[index]["anons"].string{
+                                    attributedText.append(NSAttributedString(string: "\(anaons)", attributes: [NSFontAttributeName: UIFont(name: "OpenSans", size: 12)!, NSForegroundColorAttributeName: UIColor.lightGray]))
+                                }
+                                lbl_2.attributedText=attributedText
                                 txt_2=Int(lbl_2.sizeThatFits(CGSize(width: h, height: CGFloat.greatestFiniteMagnitude)).height)
                             }
                             max_value=max(txt_1, txt_2)
-                            lbl_1.heightAnchor.constraint(equalToConstant: CGFloat(max_value)).isActive=true
-                            lbl_2.heightAnchor.constraint(equalToConstant: CGFloat(max_value)).isActive=true
+                            lbl_1.heightAnchor.constraint(equalToConstant: CGFloat(60)).isActive=true
+                            lbl_2.heightAnchor.constraint(equalToConstant: CGFloat(60)).isActive=true
                             
                             if let preview=achievements[index]["preview"].string{
                                 img_1.kf.setImage(with: URL.init(string: preview))
@@ -612,16 +772,24 @@ class DostijenieCell: UITableViewCell {
                         }else{
                             if achievements.count%2==0{
                                 if let txt=achievements[index]["title"].string{
-                                    lbl_1.text=String(txt)?.uppercased()
+                                    let attributedText = NSMutableAttributedString(string: "\(txt.uppercased())\n", attributes: [NSFontAttributeName: UIFont(name: "OpenSans-Bold", size: 16)!, NSForegroundColorAttributeName: UIColor.white])
+                                    if let anaons=achievements[index]["anons"].string{
+                                        attributedText.append(NSAttributedString(string: "\(anaons)", attributes: [NSFontAttributeName: UIFont(name: "OpenSans", size: 12)!, NSForegroundColorAttributeName: UIColor.lightGray]))
+                                    }
+                                    lbl_1.attributedText=attributedText
                                     txt_1=Int(lbl_1.sizeThatFits(CGSize(width: h, height: CGFloat.greatestFiniteMagnitude)).height)
                                 }
                                 if let txt=achievements[index+1]["title"].string{
-                                    lbl_2.text=String(txt)?.uppercased()
+                                    let attributedText = NSMutableAttributedString(string: "\(txt.uppercased())\n", attributes: [NSFontAttributeName: UIFont(name: "OpenSans-Bold", size: 16)!, NSForegroundColorAttributeName: UIColor.white])
+                                    if let anaons=achievements[index]["anons"].string{
+                                        attributedText.append(NSAttributedString(string: "\(anaons)", attributes: [NSFontAttributeName: UIFont(name: "OpenSans", size: 12)!, NSForegroundColorAttributeName: UIColor.lightGray]))
+                                    }
+                                    lbl_2.attributedText=attributedText
                                     txt_2=Int(lbl_2.sizeThatFits(CGSize(width: h, height: CGFloat.greatestFiniteMagnitude)).height)
                                 }
                                 max_value=max(txt_1, txt_2)
-                                lbl_1.heightAnchor.constraint(equalToConstant: CGFloat(max_value)).isActive=true
-                                lbl_2.heightAnchor.constraint(equalToConstant: CGFloat(max_value)).isActive=true
+                                lbl_1.heightAnchor.constraint(equalToConstant: CGFloat(60)).isActive=true
+                                lbl_2.heightAnchor.constraint(equalToConstant: CGFloat(60)).isActive=true
                                 
                                 if let preview=achievements[index]["preview"].string{
                                     img_1.kf.setImage(with: URL.init(string: preview))
@@ -631,11 +799,17 @@ class DostijenieCell: UITableViewCell {
                                 }
                             }else{
                                 img_2.isHidden=true
+                                lbl_2.isHidden=true
                                 if let txt=achievements[index]["title"].string{
-                                    lbl_1.text=String(txt)?.uppercased()
+                                    let attributedText = NSMutableAttributedString(string: "\(txt.uppercased())\n", attributes: [NSFontAttributeName: UIFont(name: "OpenSans-Bold", size: 16)!, NSForegroundColorAttributeName: UIColor.white])
+                                    if let anaons=achievements[index]["anons"].string{
+                                        attributedText.append(NSAttributedString(string: "\(anaons)", attributes: [NSFontAttributeName: UIFont(name: "OpenSans", size: 12)!, NSForegroundColorAttributeName: UIColor.lightGray]))
+                                    }
+                                    lbl_1.attributedText=attributedText
                                     max_value=Int(lbl_1.sizeThatFits(CGSize(width: h, height: CGFloat.greatestFiniteMagnitude)).height)
+                                    lbl_1.heightAnchor.constraint(equalToConstant: CGFloat(60)).isActive=true
                                 }
-                                
+                        
                                 if let preview=achievements[index]["preview"].string{
                                     img_1.kf.setImage(with: URL.init(string: preview))
                                 }
@@ -645,7 +819,7 @@ class DostijenieCell: UITableViewCell {
                         let row_view:UIView={
                             let v=UIView()
                             v.backgroundColor=UIColor.clear
-                            v.heightAnchor.constraint(equalToConstant: h+CGFloat(max_value)).isActive=true
+                            v.heightAnchor.constraint(equalToConstant: h+CGFloat(60)).isActive=true
                             v.translatesAutoresizingMaskIntoConstraints=false
                             return v
                         }()
@@ -727,8 +901,8 @@ class AdminCell: UITableViewCell {
         b.setImage(UIImage(named: "strelkaa"), for: .normal)
         b.imageView!.transform = CGAffineTransform(rotationAngle: (270.0 * CGFloat(M_PI)) / 180.0)
         b.widthAnchor.constraint(equalToConstant: 150).isActive = true
-        b.imageEdgeInsets = UIEdgeInsetsMake(10, 165, 8, 0)
-        b.contentEdgeInsets = UIEdgeInsetsMake(0, -31, 2, -30)
+        b.imageEdgeInsets = UIEdgeInsetsMake(5, 165, 5, 0)
+        b.contentEdgeInsets = UIEdgeInsetsMake(0, -31, 0, -30)
         b.titleEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 30)
         b.titleLabel?.textAlignment = .left
         b.addTarget(self, action: #selector(chooseTeam(sender:)), for: .touchUpInside)
@@ -759,6 +933,7 @@ class AdminCell: UITableViewCell {
                             img.contentMode = .scaleAspectFill
                             img.clipsToBounds=true
                             img.translatesAutoresizingMaskIntoConstraints=false
+                            img.kf.indicatorType = .activity
                             return img
                         }()
                         let img_2:UIImageView={
@@ -769,6 +944,7 @@ class AdminCell: UITableViewCell {
                             img.contentMode = .scaleAspectFill
                             img.clipsToBounds=true
                             img.translatesAutoresizingMaskIntoConstraints=false
+                            img.kf.indicatorType = .activity
                             return img
                         }()
                         let lbl_1:CustomLabel={
@@ -990,7 +1166,7 @@ class TrenerCell: UITableViewCell {
         b.setImage(UIImage(named: "strelkaa"), for: .normal)
         b.imageView!.transform = CGAffineTransform(rotationAngle: (270.0 * CGFloat(M_PI)) / 180.0)
         b.widthAnchor.constraint(equalToConstant: 150).isActive = true
-        b.imageEdgeInsets = UIEdgeInsetsMake(10, 165, 8, 0)
+        b.imageEdgeInsets = UIEdgeInsetsMake(5, 165, 5, 0)
         b.contentEdgeInsets = UIEdgeInsetsMake(0, -31, 2, -30)
         b.titleEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 30)
         b.titleLabel?.textAlignment = .left
@@ -1022,6 +1198,7 @@ class TrenerCell: UITableViewCell {
                             img.contentMode = .scaleAspectFill
                             img.clipsToBounds=true
                             img.translatesAutoresizingMaskIntoConstraints=false
+                            img.kf.indicatorType = .activity
                             return img
                         }()
                         let img_2:UIImageView={
@@ -1032,6 +1209,7 @@ class TrenerCell: UITableViewCell {
                             img.contentMode = .scaleAspectFill
                             img.clipsToBounds=true
                             img.translatesAutoresizingMaskIntoConstraints=false
+                            img.kf.indicatorType = .activity
                             return img
                         }()
                         let lbl_1:CustomLabel={
@@ -1201,7 +1379,7 @@ class TrenerCell: UITableViewCell {
             }
         }
     }
-   
+    
     func respondToSwipeGesture(gesture: UIGestureRecognizer) {
         if let swipeGesture = gesture as? UISwipeGestureRecognizer {
             switch swipeGesture.direction {
@@ -1254,7 +1432,7 @@ class SostavCell: UITableViewCell {
         b.setImage(UIImage(named: "strelkaa"), for: .normal)
         b.imageView!.transform = CGAffineTransform(rotationAngle: (270.0 * CGFloat(M_PI)) / 180.0)
         b.widthAnchor.constraint(equalToConstant: 150).isActive = true
-        b.imageEdgeInsets = UIEdgeInsetsMake(10, 165, 8, 0)
+        b.imageEdgeInsets = UIEdgeInsetsMake(5, 165, 5, 0)
         b.contentEdgeInsets = UIEdgeInsetsMake(0, -31, 2, -30)
         b.titleEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 30)
         b.titleLabel?.textAlignment = .left
@@ -1289,6 +1467,7 @@ class SostavCell: UITableViewCell {
                             img.clipsToBounds=true
                             img.backgroundColor=UIColor(colorLiteralRed: 200/255, green: 27/255, blue: 34/255, alpha: 1)
                             img.translatesAutoresizingMaskIntoConstraints=false
+                            img.kf.indicatorType = .activity
                             return img
                         }()
                         let img_2:UIImageView={
@@ -1299,13 +1478,14 @@ class SostavCell: UITableViewCell {
                             img.clipsToBounds=true
                             img.backgroundColor=UIColor(colorLiteralRed: 200/255, green: 27/255, blue: 34/255, alpha: 1)
                             img.translatesAutoresizingMaskIntoConstraints=false
+                            img.kf.indicatorType = .activity
                             return img
                         }()
                         let lbl_1:CustomLabel={
                             let l=CustomLabel()
                             l.numberOfLines=3
                             l.lineBreakMode = .byWordWrapping
-                            l.font=UIFont(name: "Century Gothic", size: 12)
+                            l.font=UIFont(name: "OpenSans-Bold", size: 16)
                             l.textColor=UIColor.white
                             l.textAlignment = .center
                             l.translatesAutoresizingMaskIntoConstraints=false
@@ -1315,7 +1495,7 @@ class SostavCell: UITableViewCell {
                             let l=CustomLabel()
                             l.numberOfLines=3
                             l.lineBreakMode = .byWordWrapping
-                            l.font=UIFont(name: "Century Gothic", size: 12)
+                            l.font=UIFont(name: "OpenSans-Bold", size: 16)
                             l.textColor=UIColor.white
                             l.textAlignment = .center
                             l.translatesAutoresizingMaskIntoConstraints=false
@@ -1325,7 +1505,7 @@ class SostavCell: UITableViewCell {
                             let l=CustomLabel()
                             l.numberOfLines=3
                             l.lineBreakMode = .byWordWrapping
-                            l.font=UIFont(name: "Century Gothic", size: 8)
+                            l.font=UIFont(name: "OpenSans-Light", size: 12)
                             l.textColor=UIColor.white
                             l.textAlignment = .center
                             l.translatesAutoresizingMaskIntoConstraints=false
@@ -1335,7 +1515,7 @@ class SostavCell: UITableViewCell {
                             let l=CustomLabel()
                             l.numberOfLines=3
                             l.lineBreakMode = .byWordWrapping
-                            l.font=UIFont(name: "Century Gothic", size: 8)
+                            l.font=UIFont(name: "OpenSans-Light", size: 12)
                             l.textColor=UIColor.white
                             l.textAlignment = .center
                             l.translatesAutoresizingMaskIntoConstraints=false
@@ -1469,10 +1649,25 @@ class SostavCell: UITableViewCell {
                         title_view_1.addSubview(tit_1)
                         title_view_2.addSubview(tit_2)
                         
-                        lbl_1.anchorWithConstantsToTop(title_view_1.topAnchor, left: title_view_1.leftAnchor, bottom: nil, right: title_view_1.rightAnchor, topConstant: 10, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
-                        lbl_2.anchorWithConstantsToTop(title_view_2.topAnchor, left: title_view_2.leftAnchor, bottom: nil, right: title_view_2.rightAnchor, topConstant: 10, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
-                        tit_1.anchorWithConstantsToTop(lbl_1.bottomAnchor, left: title_view_1.leftAnchor, bottom: nil, right: title_view_1.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
-                        tit_2.anchorWithConstantsToTop(lbl_2.bottomAnchor, left: title_view_2.leftAnchor, bottom: nil, right: title_view_2.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
+                        lbl_1.centerYAnchor.constraint(equalTo: title_view_1.centerYAnchor, constant: -5).isActive=true
+                        lbl_1.centerXAnchor.constraint(equalTo: title_view_1.centerXAnchor, constant: 0).isActive=true
+                        lbl_1.leadingAnchor.constraint(equalTo: title_view_1.leadingAnchor, constant: 5).isActive=true
+                        lbl_1.trailingAnchor.constraint(equalTo: title_view_1.trailingAnchor, constant: 5).isActive=true
+                        
+                        lbl_2.centerYAnchor.constraint(equalTo: title_view_2.centerYAnchor, constant: -5).isActive=true
+                        lbl_2.centerXAnchor.constraint(equalTo: title_view_2.centerXAnchor, constant: 0).isActive=true
+                        lbl_2.leadingAnchor.constraint(equalTo: title_view_2.leadingAnchor, constant: 5).isActive=true
+                        lbl_2.trailingAnchor.constraint(equalTo: title_view_2.trailingAnchor, constant: 5).isActive=true
+
+                        tit_1.topAnchor.constraint(equalTo: lbl_1.bottomAnchor, constant: 0).isActive=true
+                        tit_1.centerXAnchor.constraint(equalTo: title_view_1.centerXAnchor, constant: 0).isActive=true
+                        tit_1.leadingAnchor.constraint(equalTo: title_view_1.leadingAnchor, constant: 5).isActive=true
+                        tit_1.trailingAnchor.constraint(equalTo: title_view_1.trailingAnchor, constant: 5).isActive=true
+                        
+                        tit_2.topAnchor.constraint(equalTo: lbl_2.bottomAnchor, constant: 0).isActive=true
+                        tit_2.centerXAnchor.constraint(equalTo: title_view_2.centerXAnchor, constant: 0).isActive=true
+                        tit_2.leadingAnchor.constraint(equalTo: title_view_2.leadingAnchor, constant: 5).isActive=true
+                        tit_2.trailingAnchor.constraint(equalTo: title_view_2.trailingAnchor, constant: 5).isActive=true
                         
                         let row_view:UIView={
                             let v=UIView()
@@ -1541,7 +1736,11 @@ class SostavDetailCell: UITableViewCell,UIWebViewDelegate {
     var message:JSON?{
         didSet{
             if isFirstLoad{
+                info_view.removeFromSuperview()
                 web.removeFromSuperview()
+                btn.addSubview(back)
+                back.topAnchor.constraint(equalTo: btn.topAnchor, constant: 9).isActive=true
+                back.leftAnchor.constraint(equalTo: btn.leftAnchor, constant: 0).isActive=true
                 addSubview(btn)
                 btn.anchorWithConstantsToTop(self.topAnchor, left: self.leftAnchor, bottom: nil, right: nil, topConstant: 10, leftConstant: 10, bottomConstant: 0, rightConstant: 0)
                 setup()
@@ -1560,20 +1759,25 @@ class SostavDetailCell: UITableViewCell,UIWebViewDelegate {
     }
     lazy var btn:UIButton={
         let b=UIButton()
-        b.titleLabel?.font=UIFont(name: "Century Gothic - Bold", size: 20)
+        b.titleLabel?.font=UIFont(name: "CenturyGothic-Bold", size: 20)
         b.setTitleColor(UIColor.white, for: .normal)
         b.setTitle("ИГРОК", for: .normal)
-        b.setImage(UIImage(named: "strelkaa"), for: .normal)
         b.widthAnchor.constraint(equalToConstant: 150).isActive = true
-        b.heightAnchor.constraint(equalToConstant: 45).isActive=true
-        b.imageEdgeInsets = UIEdgeInsetsMake(10, -75, 10, 10)
-        b.contentEdgeInsets = UIEdgeInsetsMake(2, 10, 2, 0)
-        b.titleEdgeInsets = UIEdgeInsetsMake(5, 0, 5, 0)
+        //b.heightAnchor.constraint(equalToConstant: 45).isActive=true
         b.titleLabel?.textAlignment = .left
         b.backgroundColor = .clear
         b.addTarget(self, action: #selector(back(sender:)), for: .touchUpInside)
         b.translatesAutoresizingMaskIntoConstraints=false
         return b
+    }()
+    var back:UIImageView={
+        let i=UIImageView()
+        i.image=#imageLiteral(resourceName: "strelkaa")
+        //i.transform = CGAffineTransform(rotationAngle: (270.0 * CGFloat(M_PI)) / 180.0)
+        i.widthAnchor.constraint(equalToConstant: 9).isActive=true
+        i.heightAnchor.constraint(equalToConstant: 18).isActive=true
+        i.translatesAutoresizingMaskIntoConstraints=false
+        return i
     }()
     let h=UIScreen.main.bounds.width-20
     lazy var info_view:UIView={
@@ -1593,6 +1797,24 @@ class SostavDetailCell: UITableViewCell,UIWebViewDelegate {
         return w
     }()
     var webHeght:NSLayoutConstraint?
+    lazy var img:UIImageView={
+        let i=UIImageView()
+        i.kf.indicatorType = .activity
+        i.contentMode = .scaleAspectFill
+        i.clipsToBounds = true
+        i.widthAnchor.constraint(equalToConstant: self.h/2+self.h*1/10).isActive=true
+        i.heightAnchor.constraint(equalToConstant: self.h).isActive=true
+        i.translatesAutoresizingMaskIntoConstraints=false
+        i.kf.indicatorType = .activity
+        return i
+    }()
+    lazy var info:UILabel={
+        let l=UILabel()
+        l.numberOfLines=0
+        l.widthAnchor.constraint(equalToConstant: self.h/2).isActive=true
+        l.translatesAutoresizingMaskIntoConstraints=false
+        return l
+    }()
     func back(sender:UIButton){
         delegate?.back()
     }
@@ -1601,14 +1823,6 @@ class SostavDetailCell: UITableViewCell,UIWebViewDelegate {
     }
     func setup(){
         if message != nil{
-            let info:UILabel={
-                let l=UILabel()
-                l.numberOfLines=0
-                l.widthAnchor.constraint(equalToConstant: h/2).isActive=true
-                l.translatesAutoresizingMaskIntoConstraints=false
-                return l
-            }()
-            
             var playerName=""
             var position = ""
             var height = ""
@@ -1646,7 +1860,7 @@ class SostavDetailCell: UITableViewCell,UIWebViewDelegate {
             if let c=message?["contract"].string{
                 contract=String(c).uppercased()
             }
-
+            
             let attributedText = NSMutableAttributedString(string: "\(playerName)\n\n", attributes: [NSFontAttributeName: UIFont(name: "Century Gothic", size: 18)!, NSForegroundColorAttributeName: UIColor.white])
             attributedText.append(NSAttributedString(string: "Позиция\n", attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 10), NSForegroundColorAttributeName: UIColor.lightGray]))
             attributedText.append(NSAttributedString(string: "\(position)\n\n", attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 14), NSForegroundColorAttributeName: UIColor.white]))
@@ -1670,20 +1884,13 @@ class SostavDetailCell: UITableViewCell,UIWebViewDelegate {
             info_view.anchorWithConstantsToTop(btn.bottomAnchor, left: self.leftAnchor, bottom: nil, right: self.rightAnchor, topConstant: 10, leftConstant: 10, bottomConstant: 0, rightConstant: 10)
             web.anchorWithConstantsToTop(info_view.bottomAnchor, left: self.leftAnchor, bottom: self.bottomAnchor, right: self.rightAnchor, topConstant: 0, leftConstant: 10, bottomConstant: 10, rightConstant: 10)
             if let body=message?["body"].string{
-                web.loadHTMLString(body, baseURL: nil)
+                var mainDiv="<html>\n <head>\n <style type=\"text/css\">\n body {font-family:'OpenSans'}\n</style>\n </head>\n<body>"
+                mainDiv+=body
+                mainDiv+="</body>\n </html>"
+                web.loadHTMLString(mainDiv, baseURL: nil)
             }
             if let thumb=message?["thumb"].string{
-                let img:UIImageView={
-                    let i=UIImageView()
-                    i.kf.indicatorType = .activity
-                    i.kf.setImage(with: URL.init(string: thumb))
-                    i.contentMode = .scaleAspectFill
-                    i.clipsToBounds = true
-                    i.widthAnchor.constraint(equalToConstant: h/2).isActive=true
-                    i.heightAnchor.constraint(equalToConstant: h).isActive=true
-                    i.translatesAutoresizingMaskIntoConstraints=false
-                    return i
-                }()
+                img.kf.setImage(with: URL.init(string: thumb))
                 self.addSubview(img)
                 img.anchorWithConstantsToTop(nil, left: nil, bottom: info_view.bottomAnchor, right: info_view.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: -(h*1/15), rightConstant: 0)
             }

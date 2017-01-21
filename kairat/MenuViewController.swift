@@ -22,7 +22,8 @@ class MenuViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
         self.tableView.tableFooterView=UIView()
         self.tableView.backgroundColor=UIColor.clear
         self.tableView.separatorStyle = .none
-        
+        self.tableView.alwaysBounceVertical=false
+        fon.image=#imageLiteral(resourceName: "kairatt").imageByCroppingImage(size: CGSize(width: 1000, height: 1000))
     }
     
     override func didReceiveMemoryWarning() {
@@ -72,7 +73,7 @@ class MenuViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 250
+        return 200
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -133,22 +134,24 @@ class MenuCell: UITableViewCell {
     
     var isSelectedRow:Bool?{
         didSet{
-            title.textColor = isSelectedRow! ? UIColor.red : UIColor(colorLiteralRed: 232/255, green: 232/255, blue: 230/255, alpha: 1)
+            title.textColor = isSelectedRow! ? UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1) : UIColor(colorLiteralRed: 232/255, green: 232/255, blue: 230/255, alpha: 1)
             setupViews()
         }
     }
     
     var icon:UIImageView={
         let i=UIImageView()
+        i.contentMode = .scaleAspectFit
+        i.clipsToBounds = true
+        i.widthAnchor.constraint(equalToConstant: 13).isActive=true
         i.heightAnchor.constraint(equalToConstant: 15).isActive=true
-        i.widthAnchor.constraint(equalToConstant: 15).isActive=true
         i.translatesAutoresizingMaskIntoConstraints=false
         return i
     }()
     
     var title:UILabel={
         let l=UILabel()
-        l.font=UIFont(name: "Century Gothic", size: 17)
+        l.font=UIFont(name: "CenturyGothic-Bold", size: 16)
         l.translatesAutoresizingMaskIntoConstraints=false
         return l
     }()

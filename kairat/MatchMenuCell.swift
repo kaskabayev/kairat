@@ -374,7 +374,11 @@ class MatchMenuCell: UICollectionViewCell, UITableViewDataSource, UITableViewDel
             }
             else  {
                 let url = mediaList["videos"][row - videoIndex]["src"].string!
-                UIApplication.shared.open(URL.init(string: url)!, options: [:], completionHandler: nil)
+                if #available(iOS 10.0, *) {
+                    UIApplication.shared.open(URL.init(string: url)!, options: [:], completionHandler: nil)
+                } else {
+                    // Fallback on earlier versions
+                }
             }
         }
     }

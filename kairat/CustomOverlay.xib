@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16A323" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CustomOverlay" customModule="kairat" customModuleProvider="target">
+            <connections>
+                <outlet property="navBar" destination="2LS-qS-YIN" id="QUe-zh-9m6"/>
+                <outlet property="navItem" destination="mwH-7N-W45" id="0kV-5Q-NMD"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2LS-qS-YIN">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <items>
+                        <navigationItem id="mwH-7N-W45">
+                            <barButtonItem key="leftBarButtonItem" image="INSPhotoGalleryClose" id="1GE-3l-Uwe">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <action selector="close:" destination="-1" id="nFh-5z-TYE"/>
+                                </connections>
+                            </barButtonItem>
+                        </navigationItem>
+                    </items>
+                </navigationBar>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="video" translatesAutoresizingMaskIntoConstraints="NO" id="NvI-Kt-82C">
+                    <rect key="frame" x="119.5" y="265.5" width="135" height="135"/>
+                </imageView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="q0M-WJ-el5">
+                    <rect key="frame" x="119.5" y="265.5" width="135" height="135"/>
+                    <connections>
+                        <action selector="open_btn:" destination="-1" eventType="touchUpInside" id="6OJ-i7-bzl"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="q0M-WJ-el5" firstAttribute="top" secondItem="NvI-Kt-82C" secondAttribute="top" id="8Ac-BP-CUm"/>
+                <constraint firstItem="q0M-WJ-el5" firstAttribute="bottom" secondItem="NvI-Kt-82C" secondAttribute="bottom" id="Bfo-e5-nOf"/>
+                <constraint firstItem="NvI-Kt-82C" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="VIZ-Zt-ihY"/>
+                <constraint firstItem="q0M-WJ-el5" firstAttribute="trailing" secondItem="NvI-Kt-82C" secondAttribute="trailing" id="jAK-u5-Fno"/>
+                <constraint firstItem="NvI-Kt-82C" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="ukm-ak-Pjh"/>
+                <constraint firstItem="q0M-WJ-el5" firstAttribute="leading" secondItem="NvI-Kt-82C" secondAttribute="leading" id="uwb-Gv-Znd"/>
+            </constraints>
+        </view>
+    </objects>
+    <resources>
+        <image name="INSPhotoGalleryClose" width="15" height="15"/>
+        <image name="video" width="135" height="135"/>
+    </resources>
+</document>

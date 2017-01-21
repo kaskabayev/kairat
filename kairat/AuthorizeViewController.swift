@@ -7,6 +7,9 @@
 //
 
 import UIKit
+import FBSDKCoreKit
+import FBSDKLoginKit
+import SwiftyVK
 
 protocol AuthorizeDelegate {
     func scroll(point:CGPoint)
@@ -17,8 +20,8 @@ class AuthorizeViewController: UIViewController,AuthorizeDelegate {
         self.table.contentOffset.y=point.y
     }
 
-
     @IBOutlet weak var fon: UIImageView!
+    @IBOutlet weak var top: NSLayoutConstraint!
     @IBOutlet weak var table: UITableView!
     @IBOutlet weak var bottom: NSLayoutConstraint!
    
@@ -46,6 +49,7 @@ class AuthorizeViewController: UIViewController,AuthorizeDelegate {
         loadingView.anchorWithConstantsToTop(view.topAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
         
         self.title="АВТОРИЗАЦИЯ"
+        self.navigationController?.navigationBar.titleTextAttributes = [ NSForegroundColorAttributeName: UIColor.white,NSFontAttributeName: UIFont(name: "CenturyGothic", size: 24)!]
         self.navigationController?.setBG()
         view.backgroundColor=UIColor(colorLiteralRed: 0, green: 0, blue: 19/255, alpha: 1)
 
@@ -61,6 +65,21 @@ class AuthorizeViewController: UIViewController,AuthorizeDelegate {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let y=scrollView.contentOffset.y
+        if y>170{
+            UIView.animate(withDuration: 2.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+                self.navigationController?.setBG2()
+            }, completion: nil)
+        }else{
+            UIView.animate(withDuration: 2.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+                self.navigationController?.setBG()
+            }, completion: nil)
+        }
+        self.top.constant=0-(44+y)
+        
     }
 }
 
@@ -96,7 +115,7 @@ extension AuthorizeViewController:UITableViewDelegate{
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 170
+        return 160
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -118,6 +137,7 @@ class AuthCell: UITableViewCell {
         collection.backgroundColor=UIColor.clear
         collection.showsVerticalScrollIndicator=false
         collection.showsHorizontalScrollIndicator=false
+        collection.isPagingEnabled=true
         if UserDefaults.standard.isLoggedIn()==false{
             setup()
         }
@@ -155,9 +175,9 @@ class AuthCell: UITableViewCell {
         let b=UIButton()
         b.tag=0
         b.setTitle("ВОЙТИ", for: .normal)
-        b.titleLabel?.font=UIFont(name: "Century Gothic", size: 12)
+        b.titleLabel?.font=UIFont(name: "CenturyGothic-Bold", size: 14)
         b.setTitleColor(UIColor.white, for: .normal)
-        b.setTitleColor(UIColor.red, for: .selected)
+        b.setTitleColor(UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1), for: .selected)
         b.heightAnchor.constraint(equalToConstant: 40).isActive=true
         b.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width/2).isActive=true
         b.translatesAutoresizingMaskIntoConstraints=false
@@ -167,9 +187,9 @@ class AuthCell: UITableViewCell {
         let b=UIButton()
         b.tag=1
         b.setTitle("ЗАРЕГИСТРИРОВАТЬСЯ", for: .normal)
-        b.titleLabel?.font=UIFont(name: "Century Gothic", size: 12)
+        b.titleLabel?.font=UIFont(name: "CenturyGothic-Bold", size: 14)
         b.setTitleColor(UIColor.white, for: .normal)
-        b.setTitleColor(UIColor.red, for: .selected)
+        b.setTitleColor(UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1), for: .selected)
         b.heightAnchor.constraint(equalToConstant: 40).isActive=true
         b.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width/2).isActive=true
         b.translatesAutoresizingMaskIntoConstraints=false
@@ -177,7 +197,7 @@ class AuthCell: UITableViewCell {
     }()
     var indicator:UIView={
         let v=UIView()
-        v.backgroundColor=UIColor.red
+        v.backgroundColor=UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1)
         v.heightAnchor.constraint(equalToConstant: 4).isActive=true
         v.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width/2).isActive=true
         v.translatesAutoresizingMaskIntoConstraints=false
@@ -210,15 +230,13 @@ extension AuthCell:UICollectionViewDelegate{
         logBtn.isSelected=true
         regBtn.isSelected=false
     }
-    
 }
 
 extension AuthCell:UICollectionViewDelegateFlowLayout{
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return self.bounds.size
+        return CGSize(width: self.bounds.size.width, height: self.bounds.size.height+30)
     }
-    
 }
 
 extension AuthCell:UICollectionViewDataSource{
@@ -280,6 +298,8 @@ class LoginCell: UICollectionViewCell,UITextFieldDelegate {
         let t=UIToolbar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: 30))
         return t
     }()
+    let scope: Set<VK.Scope> = [.messages,.offline,.friends,.wall,.photos,.audio,.video,.docs,.market,.email]
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         toolBar.items=[
@@ -293,10 +313,28 @@ class LoginCell: UICollectionViewCell,UITextFieldDelegate {
         loginBtn.layer.borderColor=UIColor.white.cgColor
         loginBtn.layer.borderWidth=2
         loginBtn.addTarget(self, action: #selector(login), for: .touchUpInside)
-        vBtn.addTarget(self, action: #selector(vkAuth(sender:)), for: .touchUpInside)
+        vBtn.addTarget(self, action: #selector(auth(sender:)), for: .touchUpInside)
+        gBtn.addTarget(self, action: #selector(auth(sender:)), for: .touchUpInside)
+        fBtn.addTarget(self, action: #selector(auth(sender:)), for: .touchUpInside)
+        
         NotificationCenter.default.addObserver(self, selector: #selector(loginEvent(sender:)), name: NSNotification.Name(rawValue: "loginEvent"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(vk_login_event(sender:)), name: NSNotification.Name(rawValue: "vk_login_event"), object: nil)
     }
-    
+//    override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+//        let attr: UICollectionViewLayoutAttributes = layoutAttributes.copy() as! UICollectionViewLayoutAttributes
+//        
+//        var newFrame = attr.frame
+//        self.frame = newFrame
+//        
+//        self.setNeedsLayout()
+//        self.layoutIfNeeded()
+//        
+//        let desiredHeight: CGFloat = self.contentView.systemLayoutSizeFitting(UILayoutFittingCompressedSize).height
+//        newFrame.size.height = desiredHeight
+//        newFrame.size.width=UIScreen.main.bounds.width
+//        attr.frame = newFrame
+//        return attr
+//    }
     func dismissKeyboard() {
         parent?.view.endEditing(true)
         delegate?.scroll(point: CGPoint.zero)
@@ -307,8 +345,140 @@ class LoginCell: UICollectionViewCell,UITextFieldDelegate {
         delegate?.scroll(point: point)
     }
 
-    func vkAuth(sender:UIButton){
-        
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        switch textField {
+        case email:
+            if (textField.text?.characters.count)!>0{
+                pass.becomeFirstResponder()
+            }
+            return true
+        case pass:
+            dismissKeyboard()
+            if (textField.text?.characters.count)!>0{
+                login()
+            }
+            return true
+        default:
+            return true
+        }
+    }
+
+    func auth(sender:UIButton){
+        switch sender {
+        case vBtn:
+            VK.logOut()
+            VK.logIn()
+            break
+        case fBtn:
+            let loginManager=FBSDKLoginManager()
+            loginManager.logOut()
+            loginManager.logIn(withReadPermissions: ["public_profile"], from: parent, handler: {
+                (result, error) in
+                if error == nil{
+                    if let token=FBSDKAccessToken.current(){
+                        CustomRequests.fb(view: self.parent!, loading: self.loading!, token: token.tokenString){
+                            response in
+                            if response.count>0{
+                                if response["status"].string=="ok"{
+                                    let cancel=UIAlertAction(title: "Закрыть", style: .destructive){
+                                        (result:UIAlertAction)->Void in
+                                        UserDefaults.standard.setIsLoggedIn(true)
+                                        var model=[String:String]()
+                                        if let id=response["id"].string{
+                                            model["id"]=id
+                                        }
+                                        if let login=response["name"].string{
+                                            model["login"]=login
+                                        }
+                                        if let token=response["token"].string{
+                                            model["token"]=token
+                                        }
+                                        if let refresh_token=response["refresh_token"].string{
+                                            model["refresh_token"]=refresh_token
+                                        }
+                                        UserDefaults.standard.setInfo(model)
+                                        self.parent?.navigationController?.popViewController(animated: true)
+                                    }
+                                    self.parent?.showAlert(msg: "Вы успешно авторизовались", actions: [cancel])
+                                }else{
+                                    let cancel=UIAlertAction(title: "Закрыть", style: .destructive){
+                                        (result:UIAlertAction)->Void in
+                                        
+                                    }
+                                    self.parent?.showAlert(msg: "Ошибка", actions: [cancel])
+                                }
+                            }else{
+                                let cancel=UIAlertAction(title: "Закрыть", style: .destructive){
+                                    (result:UIAlertAction)->Void in
+                                    
+                                }
+                                self.parent?.showAlert(msg: "Ошибка", actions: [cancel])
+                            }
+                        }
+                    }else{
+                        let cancel=UIAlertAction(title: "Закрыть", style: .destructive){
+                            (result:UIAlertAction)->Void in
+                            
+                        }
+                        self.parent?.showAlert(msg: "Ошибка", actions: [cancel])
+                    }
+                }else if result != nil{
+                    if (result?.isCancelled)!{
+                        
+                    }
+                }
+            })
+            break
+        case gBtn:
+            break
+        default:
+            break
+        }
+    }
+    
+    func vk_login_event(sender:NSNotification){
+        if let token=(sender.object as! [String:String])["access_token"]{
+            CustomRequests.vk(view: parent!, loading: loading!, token: token){
+                response in
+                print(response)
+                if response.count>0{
+                    if response["status"].string=="ok"{
+                        let cancel=UIAlertAction(title: "Закрыть", style: .destructive){
+                            (result:UIAlertAction)->Void in
+                            UserDefaults.standard.setIsLoggedIn(true)
+                            var model=[String:String]()
+                            if let id=response["id"].string{
+                                model["id"]=id
+                            }
+                            if let login=response["name"].string{
+                                model["login"]=login
+                            }
+                            if let token=response["token"].string{
+                                model["token"]=token
+                            }
+                            if let refresh_token=response["refresh_token"].string{
+                                model["refresh_token"]=refresh_token
+                            }
+                            UserDefaults.standard.setInfo(model)
+                            self.parent?.navigationController?.popViewController(animated: true)
+                        }
+                        self.parent?.showAlert(msg: "Вы успешно авторизовались", actions: [cancel])
+                    }else{
+                        let cancel=UIAlertAction(title: "Закрыть", style: .destructive){
+                            (result:UIAlertAction)->Void in
+                            
+                        }
+                        self.parent?.showAlert(msg: "Ошибка", actions: [cancel])
+                    }
+                }else{
+                    let cancel=UIAlertAction(title: "Закрыть", style: .destructive){
+                        (result:UIAlertAction)->Void in
+                        
+                    }
+                    self.parent?.showAlert(msg: "Ошибка", actions: [cancel])
+                }
+            }
+        }
     }
     
     func loginEvent(sender:NSNotification){
@@ -330,6 +500,9 @@ class LoginCell: UICollectionViewCell,UITextFieldDelegate {
                         }
                         if let token=response["token"].string{
                             model["token"]=token
+                        }
+                        if let refresh_token=response["refresh_token"].string{
+                            model["refresh_token"]=refresh_token
                         }
                         UserDefaults.standard.setInfo(model)
                         self.parent?.navigationController?.popViewController(animated: true)
@@ -363,6 +536,9 @@ class LoginCell: UICollectionViewCell,UITextFieldDelegate {
                         }
                         if let token=response["token"].string{
                             model["token"]=token
+                        }
+                        if let refresh_token=response["refresh_token"].string{
+                            model["refresh_token"]=refresh_token
                         }
                         UserDefaults.standard.setInfo(model)
                         self.parent?.navigationController?.popViewController(animated: true)

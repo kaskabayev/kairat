@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0810"
+   LastUpgradeVersion = "0700"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A21582AF2636CB4516F8D14261797A40"
+               BlueprintIdentifier = "C23991D1F4A041A8CA0A870066039D04"
                BuildableName = "Pods_kairat.framework"
                BlueprintName = "Pods-kairat"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A21582AF2636CB4516F8D14261797A40"
+            BlueprintIdentifier = "C23991D1F4A041A8CA0A870066039D04"
             BuildableName = "Pods_kairat.framework"
             BlueprintName = "Pods-kairat"
             ReferencedContainer = "container:Pods.xcodeproj">

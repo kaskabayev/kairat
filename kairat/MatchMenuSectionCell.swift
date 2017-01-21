@@ -11,15 +11,25 @@ import UIKit
 class MatchMenuSectionCell: UITableViewCell {
     
     func setupReviewSectionViews() {
+        removeReviewSectionViewsFromSuperView()
         removeTeamSectionViewsFromSuperView()
         removeChatSectionViewsFromSuperView()
         removeMediaSectionViewsFromSuperView()
+        
+        firstTeamLabel.font=UIFont(name: "OpenSans", size: 12)
+        firstTeamLabel.textAlignment = .right
+        secondTeamLabel.font=UIFont(name: "OpenSans", size: 12)
+        secondTeamLabel.textAlignment = .left
+        middleLabel.font=UIFont(name: "OpenSans", size: 12)
+        middleTimeLabel.font=UIFont(name: "OpenSans-Bold", size: 12)
         
         addSubview(firstTeamLabel)
         addSubview(middleLabel)
         addSubview(secondTeamLabel)
         addSubview(middleTimeLabel)
         addSubview(verticalLine)
+        addSubview(firstIcon)
+        addSubview(secondIcon)
         
         middleLabel.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         
@@ -27,15 +37,18 @@ class MatchMenuSectionCell: UITableViewCell {
         
         verticalLine.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         
-        addConstraintsWithFormat(format: "H:[v0]-16-[v1]-16-[v2]", views: firstTeamLabel, middleTimeLabel, secondTeamLabel)
+        addConstraintsWithFormat(format: "H:|-10-[v0]-8-[v1]-10-[v2]-10-[v3]-8-[v4]-10-|", views: firstTeamLabel,firstIcon, middleTimeLabel, secondIcon,secondTeamLabel)
         
         addConstraintsWithFormat(format: "H:[v0(30)]", views: middleTimeLabel)
+        
+        firstIcon.centerYAnchor.constraint(equalTo: middleTimeLabel.centerYAnchor).isActive = true
+        secondIcon.centerYAnchor.constraint(equalTo: middleTimeLabel.centerYAnchor).isActive = true
         
         firstTeamLabel.centerYAnchor.constraint(equalTo: middleTimeLabel.centerYAnchor).isActive = true
         secondTeamLabel.centerYAnchor.constraint(equalTo: middleTimeLabel.centerYAnchor).isActive = true
         
-        addConstraintsWithFormat(format: "V:|[v0(20)]-[v1(16)]|", views: middleLabel, verticalLine)
-        addConstraintsWithFormat(format: "V:|[v0(30)]-2-[v1(16)]|", views: middleTimeLabel, verticalLine)
+        addConstraintsWithFormat(format: "V:|-10-[v0(20)]-(10)-[v1(16)]-(-10)-|", views: middleLabel, verticalLine)
+        addConstraintsWithFormat(format: "V:|-10-[v0(30)]-(10)-[v1(16)]-(-10)-|", views: middleTimeLabel, verticalLine)
         
         middleTimeLabel.layer.cornerRadius = 15
         middleTimeLabel.clipsToBounds = true
@@ -48,6 +61,21 @@ class MatchMenuSectionCell: UITableViewCell {
     let firstTeamLabel = MatchMenuSectionCell.setupReviewLabels()
     let middleLabel = MatchMenuSectionCell.setupReviewLabels()
     let secondTeamLabel = MatchMenuSectionCell.setupReviewLabels()
+    let firstIcon:UIImageView={
+        let img=UIImageView()
+        img.clipsToBounds=true
+        img.widthAnchor.constraint(equalToConstant: 15).isActive=true
+        img.heightAnchor.constraint(equalToConstant: 15).isActive=true
+        return img
+    }()
+    let secondIcon:UIImageView={
+        let img=UIImageView()
+        img.clipsToBounds=true
+        img.widthAnchor.constraint(equalToConstant: 15).isActive=true
+        img.contentMode = .scaleAspectFit
+        //img.heightAnchor.constraint(equalToConstant: 20).isActive=true
+        return img
+    }()
     
     let middleTimeLabel = MatchMenuSectionCell.setupReviewLabels()
     
@@ -60,7 +88,7 @@ class MatchMenuSectionCell: UITableViewCell {
     
     let verticalLine: UIView = {
         let view = UIView()
-        view.widthAnchor.constraint(equalToConstant: 1).isActive = true
+        view.widthAnchor.constraint(equalToConstant: 2).isActive = true
         view.backgroundColor = .darkGray
         return view
     }()
@@ -76,17 +104,19 @@ class MatchMenuSectionCell: UITableViewCell {
             backgroundColor = .clear
             
             addSubview(titleLabel)
-            titleLabel.anchorWithConstantsToTop(top: topAnchor, left: leftAnchor, bottom: bottomAnchor, right: nil, topConstant: 13, leftConstant: 0, bottomConstant: 6, rightConstant: 0)
+            titleLabel.anchorWithConstantsToTop(top: topAnchor, left: leftAnchor, bottom: bottomAnchor, right: nil, topConstant: 13, leftConstant: 10, bottomConstant: 6, rightConstant: 10)
         }
         else {
             titleLabel.removeFromSuperview()
-            backgroundColor = .white
+            backgroundColor = .clear
             
-            addSubview(playerNumberLabel)
-            addSubview(playerPositionLabel)
-            addSubview(aboutPlayerLabel)
+            teamView.addSubview(playerNumberLabel)
+            teamView.addSubview(aboutPlayerLabel)
             
-            addConstraintsWithFormat(format: "H:|-8-[v0(25)]-8-[v1]-8-[v2]", views: playerNumberLabel, playerPositionLabel, aboutPlayerLabel)
+            addSubview(teamView)
+            teamView.anchorWithConstantsToTop(top: self.topAnchor, left: self.leftAnchor, bottom: self.bottomAnchor, right: self.rightAnchor, topConstant: 0, leftConstant: 10, bottomConstant: 0, rightConstant: 10)
+            
+            addConstraintsWithFormat(format: "H:|-8-[v0(25)]-8-[v1]", views: playerNumberLabel, aboutPlayerLabel)
             
             addConstraintsWithFormat(format: "V:|-5-[v0]|", views: aboutPlayerLabel)
             
@@ -94,7 +124,6 @@ class MatchMenuSectionCell: UITableViewCell {
             
             playerNumberLabel.centerYAnchor.constraint(equalTo: aboutPlayerLabel.centerYAnchor).isActive = true
             
-            playerPositionLabel.centerYAnchor.constraint(equalTo: playerNumberLabel.centerYAnchor).isActive = true
         }
         
     }
@@ -104,7 +133,12 @@ class MatchMenuSectionCell: UITableViewCell {
         label.font = UIFont.systemFont(ofSize: 12)
         return label
     }()
-    
+    let teamView:UIView={
+        let view=UIView()
+        view.backgroundColor = .white
+        view.translatesAutoresizingMaskIntoConstraints=false
+        return view
+    }()
     let playerNumberLabel: UILabel = {
         let label = UILabel()
         label.text = "10"
@@ -114,15 +148,6 @@ class MatchMenuSectionCell: UITableViewCell {
         label.clipsToBounds = true
         label.layer.borderColor = UIColor.lightGray.cgColor
         label.layer.borderWidth = 0.6
-        return label
-    }()
-    
-    let playerPositionLabel: UILabel = {
-        let label = UILabel()
-        label.text = "зщ"
-        label.textAlignment = .center
-        label.font = UIFont.boldSystemFont(ofSize: 12)
-        label.textColor = .lightGray
         return label
     }()
     
@@ -208,12 +233,14 @@ class MatchMenuSectionCell: UITableViewCell {
         secondTeamLabel.removeFromSuperview()
         middleTimeLabel.removeFromSuperview()
         verticalLine.removeFromSuperview()
+        firstIcon.removeFromSuperview()
+        secondIcon.removeFromSuperview()
     }
     
     func removeTeamSectionViewsFromSuperView() {
         titleLabel.removeFromSuperview()
+        teamView.removeFromSuperview()
         playerNumberLabel.removeFromSuperview()
-        playerPositionLabel.removeFromSuperview()
         aboutPlayerLabel.removeFromSuperview()
         
     }

@@ -28,12 +28,14 @@ class StatisticViewController: UIViewController {
     
     @IBOutlet weak var menu: UIBarButtonItem!
     @IBOutlet weak var fon: UIImageView!
+    @IBOutlet weak var top: NSLayoutConstraint!
+    @IBOutlet weak var blur_top: NSLayoutConstraint!
+    @IBOutlet weak var trans_top: NSLayoutConstraint!
     @IBOutlet weak var table: UITableView!
     @IBOutlet weak var collection: UICollectionView!
+    @IBOutlet weak var seasonView: UIView!
     @IBOutlet weak var seasonBtn: UIButton!
     var picker=UIPickerView()
-    
-    let alertController = UIAlertController(title: "\n\n\n\n\n\n\n\n", message: "", preferredStyle: .actionSheet)
     
     var turnir_model=[Turnir]()
     var turnirs=JSON.null
@@ -61,7 +63,33 @@ class StatisticViewController: UIViewController {
         return l
     }()
     var loadingViewHeght:NSLayoutConstraint?
-    
+    lazy var seasonButton: UIButton = {
+        let button = UIButton()
+        button.setTitleColor(.white, for: .normal)
+        button.heightAnchor.constraint(equalToConstant: 14).isActive = true
+        button.titleLabel?.font = UIFont(name: "CenturyGothic", size: 16)
+        button.addTarget(self, action: #selector(showPicker), for: .touchUpInside)
+        button.setImage(UIImage(named: "strelkaa"), for: .normal)
+        button.imageView!.transform = CGAffineTransform(rotationAngle: (270.0 * CGFloat(M_PI)) / 180.0)
+        button.widthAnchor.constraint(equalToConstant: 94).isActive = true
+        button.imageEdgeInsets = UIEdgeInsetsMake(4, 97, 4, 0)
+        button.titleEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 50)
+        button.contentEdgeInsets = UIEdgeInsetsMake(0, -20, 0, -30)
+        button.translatesAutoresizingMaskIntoConstraints=false
+        return button
+    }()
+    let buttonBottomLine: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        return view
+    }()
+    var trans_view:UIView={
+        let v=UIView()
+        v.backgroundColor=UIColor.white.withAlphaComponent(0.2)
+        return v
+    }()
+    var lastContentOffset_x:CGFloat=0
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title="ТАБЛИЦА"
@@ -73,7 +101,7 @@ class StatisticViewController: UIViewController {
         seasonBtn.addTarget(self, action: #selector(showPicker), for: .touchUpInside)
         table.addSubview(refreshControl)
         table.translatesAutoresizingMaskIntoConstraints=false
-        table.anchorWithConstantsToTop(self.view.topAnchor, left: self.view.leftAnchor, bottom: self.view.bottomAnchor, right: self.view.rightAnchor, topConstant:UIApplication.shared.statusBarFrame.height, leftConstant: 10, bottomConstant: 10, rightConstant: 10)
+        table.anchorWithConstantsToTop(self.view.topAnchor, left: self.view.leftAnchor, bottom: self.view.bottomAnchor, right: self.view.rightAnchor, topConstant:UIApplication.shared.statusBarFrame.height, leftConstant: 0, bottomConstant: 10, rightConstant: 0)
         table.contentInset=UIEdgeInsets(top: 20+(navigationController?.navigationBar.frame.height)!, left: 0, bottom: 0, right: 0)
         table.tableFooterView=UIView()
         table.backgroundColor=UIColor.clear
@@ -83,14 +111,29 @@ class StatisticViewController: UIViewController {
         initializePicker()
         initializeYear()
         loadData()
+        setup_menu()
     }
     
+    let menuBtn=UIBarButtonItem()
+    func open(_ sender: Any) {
+        self.slideMenuController()?.toggleLeft()
+    }
+    func setup_menu(){
+        let lBtn = UIButton()
+        lBtn.setImage(#imageLiteral(resourceName: "menu"), for: .normal)
+        lBtn.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+        lBtn.addTarget(self, action: #selector(open), for: .touchUpInside)
+        menuBtn.customView=lBtn
+        self.navigationItem.setLeftBarButtonItems([menuBtn], animated: false)
+    }
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let y=scrollView.contentOffset.y
-        if y>collection.frame.origin.y{
-            self.navigationController?.setBG2()
+        if lastContentOffset_x==scrollView.contentOffset.x{
+            let y=scrollView.contentOffset.y
+            top.constant=0-(108+y)
+            blur_top.constant=0-(64+y)
+            trans_top.constant=0-(365+y)
         }else{
-            self.navigationController?.setBG()
+            lastContentOffset_x=scrollView.contentOffset.x
         }
     }
     
@@ -142,6 +185,33 @@ class StatisticViewController: UIViewController {
         loadingView.anchorWithConstantsToTop(view.topAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
         picker.delegate=self
         picker.dataSource=self
+       
+        seasonButton.addSubview(buttonBottomLine)
+        buttonBottomLine.anchorWithConstantsToTop(top: nil, left: seasonButton.leftAnchor, bottom: seasonButton.bottomAnchor, right: seasonButton.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: -2, rightConstant: 0)
+        seasonView.addSubview(seasonButton)
+        seasonButton.anchorToTop(seasonBtn.topAnchor, left: seasonBtn.leftAnchor, bottom: seasonBtn.bottomAnchor, right: seasonBtn.rightAnchor)
+        seasonBtn.isHidden=true
+        
+    }
+    func initializeYear(){
+        let date = NSDate()
+        let calendar = NSCalendar.current
+        let y = calendar.component(.year, from: date as Date)
+        for item in y-10...y+1 {
+            year.append(String(item))
+        }
+        season=String(y)
+        setTile(title: season)
+        picker.reloadAllComponents()
+    }
+    func setTile(title:String){
+        seasonButton.setTitle(title, for: .normal)
+    }
+    func showPicker(){
+        if let index=year.index(where: {$0==season}){
+              picker.selectRow(Int(index), inComponent: 0, animated: true)
+        }
+        let alertController = UIAlertController(title: "\n\n\n\n\n\n\n\n", message: "", preferredStyle: .actionSheet)
         alertController.view.addSubview( picker)
         picker.anchorWithConstantsToTop(top: alertController.view.topAnchor, left: alertController.view.leftAnchor, bottom: nil, right: alertController.view.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
         let cancelAction = UIAlertAction(title: "Отмена", style: .cancel, handler:  { void in
@@ -152,25 +222,7 @@ class StatisticViewController: UIViewController {
         })
         alertController.addAction(okAction)
         alertController.addAction(cancelAction)
-    }
-    func initializeYear(){
-        let date = NSDate()
-        let calendar = NSCalendar.current
-        let y = calendar.component(.year, from: date as Date)
-        for item in y-10...y+1 {
-            year.append(String(item))
-        }
-        season=String(y+1)
-        setTile(title: season)
-    }
-    func setTile(title:String){
-        seasonBtn.setAttributedTitle(NSAttributedString(string: title, attributes: [NSUnderlineStyleAttributeName:NSUnderlineStyle.styleSingle.rawValue,NSForegroundColorAttributeName:UIColor.white]), for: .normal)
-    }
-    func showPicker(){
         self.present(alertController, animated: true, completion: nil)
-    }
-    @IBAction func open(_ sender: Any) {
-        self.slideMenuController()?.toggleLeft()
     }
 }
 
@@ -214,10 +266,12 @@ extension StatisticViewController:UICollectionViewDataSource,UICollectionViewDel
         let cell=collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! TurnirCell
         let m=turnir_model[indexPath.row]
         if indexPath.row==selected_turnir_id{
-            cell.turnirTitle.textColor=UIColor.red
+            cell.turnirTitle.textColor=UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1)
+            cell.turnirTitle.font=UIFont(name: "CenturyGothic-Bold", size: 14)
             cell.turnirImg.kf.setImage(with: URL.init(string: m.img_active))
         }else{
             cell.turnirTitle.textColor=UIColor.white
+            cell.turnirTitle.font=UIFont(name: "CenturyGothic", size: 14)
             cell.turnirImg.kf.setImage(with: URL.init(string: m.img))
         }
         cell.turnirTitle.text=m.name
@@ -297,7 +351,7 @@ extension StatisticViewController:UITableViewDataSource,UITableViewDelegate{
         return 20
     }
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        cell.backgroundColor=UIColor.white
+        cell.backgroundColor=UIColor.clear
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if message.isEmpty{
@@ -321,6 +375,7 @@ class StatisticCell:UITableViewCell{
     override func awakeFromNib() {
         super.awakeFromNib()
         selectionStyle = .none
+        
     }
 }
 

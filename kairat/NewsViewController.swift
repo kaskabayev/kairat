@@ -15,9 +15,11 @@ class NewsViewController: UIViewController {
     var message=JSON.null
     var selectedID = ""
     var page=0
-    let limit=5
+    let limit=10
+    var is_nxt_active=false
     @IBOutlet weak var fon: UIImageView!
-    
+    @IBOutlet weak var blur: UIVisualEffectView!
+    @IBOutlet weak var fon_blur: UIImageView!
     @IBOutlet weak var newsTable: UITableView!
     var refreshControl: UIRefreshControl!
     var loadingView:UIView={
@@ -36,6 +38,7 @@ class NewsViewController: UIViewController {
         return l
     }()
     var loadingViewHeght:NSLayoutConstraint?
+   
     override func viewDidLoad() {
         super.viewDidLoad()
         switch selectedIndex {
@@ -49,9 +52,16 @@ class NewsViewController: UIViewController {
             break
         }
         self.navigationController?.setBG()
+        
+        let lBtn = UIButton()
+        lBtn.setImage(#imageLiteral(resourceName: "menu"), for: .normal)
+        lBtn.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+        lBtn.addTarget(self, action: #selector(open), for: .touchUpInside)
+        menuBtn.customView=lBtn
+        self.navigationItem.setLeftBarButtonItems([menuBtn], animated: false)
+        
         self.view.backgroundColor=UIColor(colorLiteralRed: 0, green: 0, blue: 19/255, alpha: 1)
         fon.image=#imageLiteral(resourceName: "fon").imageByCroppingImage(size: CGSize(width: 1200, height: 1200))
-        
         refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(loadData), for: .valueChanged)
         newsTable.addSubview(refreshControl)
@@ -65,9 +75,20 @@ class NewsViewController: UIViewController {
         loadData()
     }
     
+    let menuBtn=UIBarButtonItem()
+    func open(_ sender: Any) {
+        self.slideMenuController()?.toggleLeft()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        loadData()
+        switch selectedIndex {
+        case 5:
+            loadData()
+            break
+        default:
+            break
+        }
     }
     
     override func didReceiveMemoryWarning() {
@@ -103,6 +124,7 @@ class NewsViewController: UIViewController {
                         jsonArr.append(anyObj)
                     }
                     self.message=JSON.init(jsonArr)
+                    self.newsTable.reloadData()
                 }
             }else{
                 view.addSubview(loadingView)
@@ -140,6 +162,7 @@ class NewsViewController: UIViewController {
                 response in
                 self.loadingView.removeFromSuperview()
                 if response != nil{
+                    self.is_nxt_active=false
                     var d=self.message.arrayValue
                     d+=response.arrayValue
                     self.message=JSON(d)
@@ -164,15 +187,10 @@ class NewsViewController: UIViewController {
         }
     }
     
-    @IBAction func open(_ sender: Any) {
-        self.slideMenuController()?.toggleLeft()
-    }
-    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let backItem = UIBarButtonItem()
         backItem.title = ""
         navigationItem.backBarButtonItem = backItem
-        
         if segue.identifier=="newsDetail"{
             let dc=segue.destination as! NewsDetailViewController
             dc.id=selectedID
@@ -187,7 +205,7 @@ extension NewsViewController:UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if message == nil{
+        if message.count==0{
             return 1
         }else{
             return (message.array?.count)!+1
@@ -195,7 +213,7 @@ extension NewsViewController:UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if message != nil{
+        if message.count>0{
             if indexPath.row<(message.array?.count)!{
                 var m=(message.array?[indexPath.row])!
                 if m["preview"] == nil{
@@ -205,15 +223,24 @@ extension NewsViewController:UITableViewDataSource{
                     }
                     if let anons=m["anons"].string{
                         let fullString = NSMutableAttributedString(string: anons)
-                        if let comCount=m["comments_count"].int{
-                            let image1Attachment = NSTextAttachment()
-                            image1Attachment.image = #imageLiteral(resourceName: "comment")
-                            image1Attachment.bounds=CGRect(x: 0, y: -5, width: 15, height: 15)
-                            let image1String = NSAttributedString(attachment: image1Attachment)
-                            fullString.append(image1String)
-                            fullString.append(NSAttributedString(string: " \(comCount)"))
-                        }
                         cell.detailTxt.attributedText=fullString
+                    }
+                    if let comCount=m["comments_count"].int{
+                        if comCount>0{
+                            cell.com_img.isHidden=false
+                            cell.com_count.isHidden=false
+                            cell.bottom.constant=35
+                            cell.com_count.text="\(comCount)"
+                        }
+                        else{
+                            cell.com_img.isHidden=true
+                            cell.com_count.isHidden=true
+                            cell.bottom.constant=5
+                        }
+                    }else{
+                        cell.com_img.isHidden=true
+                        cell.com_count.isHidden=true
+                        cell.bottom.constant=5
                     }
                     return cell
                 }else{
@@ -227,15 +254,24 @@ extension NewsViewController:UITableViewDataSource{
                     }
                     if let anons=m["anons"].string{
                         let fullString = NSMutableAttributedString(string: anons)
-                        if let comCount=m["comments_count"].int{
-                            let image1Attachment = NSTextAttachment()
-                            image1Attachment.image = #imageLiteral(resourceName: "comment")
-                            image1Attachment.bounds=CGRect(x: 10, y: 2, width: 13, height: 10)
-                            let image1String = NSAttributedString(attachment: image1Attachment)
-                            fullString.append(image1String)
-                            fullString.append(NSAttributedString(string: " \(comCount)"))
-                        }
                         cell.detailTxt.attributedText=fullString
+                    }
+                    if let comCount=m["comments_count"].int{
+                        if comCount>0{
+                            cell.com_img.isHidden=false
+                            cell.com_count.isHidden=false
+                            cell.bottom.constant=35
+                            cell.com_count.text="\(comCount)"
+                        }
+                        else{
+                            cell.com_img.isHidden=true
+                            cell.com_count.isHidden=true
+                            cell.bottom.constant=5
+                        }
+                    }else{
+                        cell.com_img.isHidden=true
+                        cell.com_count.isHidden=true
+                        cell.bottom.constant=5
                     }
                     if let dtime=m["dtime"].string{
                         let date=Date(timeIntervalSince1970: TimeInterval.init(dtime)!)
@@ -246,11 +282,16 @@ extension NewsViewController:UITableViewDataSource{
                     }
                     return cell
                 }
-                
             }
-            let cell=tableView.dequeueReusableCell(withIdentifier: "last", for: indexPath) as! LastCell
-            cell.nextBtn.addTarget(self, action: #selector(loadNext), for: .touchUpInside)
-            return cell
+            return UITableViewCell()
+//            if selectedIndex==0{
+//                let cell=tableView.dequeueReusableCell(withIdentifier: "last", for: indexPath) as! LastCell
+//                cell.nextBtn.addTarget(self, action: #selector(loadNext), for: .touchUpInside)
+//                return cell
+//            }else{
+//                return UITableViewCell()
+//            }
+            
         }else{
             switch selectedIndex {
             case 0:
@@ -270,17 +311,20 @@ extension NewsViewController:UITableViewDelegate{
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
-        var m=(message.array?[indexPath.row])!
-        if m != nil{
-            if let id=m["id"].string{
-                selectedID = id
-                performSegue(withIdentifier: "newsDetail", sender: self)
+        if message.count>0{
+            var m=(message.array?[indexPath.row])!
+            if m != nil{
+                if let id=m["id"].string{
+                    selectedID = id
+                    performSegue(withIdentifier: "newsDetail", sender: self)
+                }
             }
+
         }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if message == nil{
+        if message.count==0{
             return 70
         }
         return UITableViewAutomaticDimension
@@ -288,6 +332,20 @@ extension NewsViewController:UITableViewDelegate{
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         cell.backgroundColor=UIColor.clear
+        switch selectedIndex {
+        case 0:
+            if message.count>0{
+                if indexPath.row==message.count{
+                    if is_nxt_active==false{
+                        is_nxt_active=true
+                        loadNext()
+                    }
+                }
+            }
+            break
+        default:
+            break
+        }
     }
     
 }
@@ -298,6 +356,9 @@ class NewsCell: UITableViewCell {
     @IBOutlet weak var dataTxt: UILabel!
     @IBOutlet weak var titleTxt: UILabel!
     @IBOutlet weak var detailTxt: UILabel!
+    @IBOutlet weak var com_img: UIImageView!
+    @IBOutlet weak var com_count: UILabel!
+    @IBOutlet weak var bottom: NSLayoutConstraint!
     override func awakeFromNib() {
         super.awakeFromNib()
     }
@@ -314,6 +375,9 @@ class NewsNoImageCell: UITableViewCell {
     
     @IBOutlet weak var titleTxt: UILabel!
     @IBOutlet weak var detailTxt: UILabel!
+    @IBOutlet weak var com_img: UIImageView!
+    @IBOutlet weak var com_count: UILabel!
+    @IBOutlet weak var bottom: NSLayoutConstraint!
     override func awakeFromNib() {
         super.awakeFromNib()
     }

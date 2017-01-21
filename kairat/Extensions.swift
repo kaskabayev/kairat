@@ -9,6 +9,15 @@
 import UIKit
 import SwiftyJSON
 
+extension String {
+    func heightWithConstrainedWidth(width: CGFloat, font: UIFont) -> CGFloat {
+        let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
+        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSFontAttributeName: font], context: nil)
+        
+        return boundingBox.height
+    }
+}
+
 extension UIImage{
     func imageByCroppingImage(size : CGSize) -> UIImage{
         let refWidth : CGFloat = CGFloat(self.cgImage!.width)
@@ -220,6 +229,7 @@ extension UserDefaults {
     
     //info
     func setInfo(_ value:[String:String]){
+         setValue([:], forKey: UserDefaultsKeys.info.rawValue)
          setValue(value, forKey: UserDefaultsKeys.info.rawValue)
          UserDefaults.standard.synchronize()
     }

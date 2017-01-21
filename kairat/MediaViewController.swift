@@ -42,9 +42,9 @@ class MediaViewController: UIViewController {
         let b=UIButton()
         b.tag=0
         b.setTitle("ФОТО", for: .normal)
-        b.titleLabel?.font=UIFont(name: "Century Gothic Bold", size: 12)
+        b.titleLabel?.font=UIFont(name: "CenturyGothic-Bold", size: 12)
         b.setTitleColor(UIColor.white, for: .normal)
-        b.setTitleColor(UIColor.red, for: .selected)
+        b.setTitleColor(UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1), for: .selected)
         b.heightAnchor.constraint(equalToConstant: 40).isActive=true
         b.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width/2).isActive=true
         b.translatesAutoresizingMaskIntoConstraints=false
@@ -54,9 +54,9 @@ class MediaViewController: UIViewController {
         let b=UIButton()
         b.tag=1
         b.setTitle("ВИДЕО", for: .normal)
-        b.titleLabel?.font=UIFont(name: "Century Gothic Bold", size: 12)
+        b.titleLabel?.font=UIFont(name: "CenturyGothic-Bold", size: 12)
         b.setTitleColor(UIColor.white, for: .normal)
-        b.setTitleColor(UIColor.red, for: .selected)
+        b.setTitleColor(UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1), for: .selected)
         b.heightAnchor.constraint(equalToConstant: 40).isActive=true
         b.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width/2).isActive=true
         b.translatesAutoresizingMaskIntoConstraints=false
@@ -64,8 +64,8 @@ class MediaViewController: UIViewController {
     }()
     var indicator:UIView={
         let v=UIView()
-        v.backgroundColor=UIColor.red
-        v.heightAnchor.constraint(equalToConstant: 3).isActive=true
+        v.backgroundColor=UIColor(colorLiteralRed: 178/255, green: 28/255, blue: 31/255, alpha: 1)
+        v.heightAnchor.constraint(equalToConstant: 4).isActive=true
         v.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width/2).isActive=true
         v.translatesAutoresizingMaskIntoConstraints=false
         return v
@@ -85,10 +85,29 @@ class MediaViewController: UIViewController {
         collection.translatesAutoresizingMaskIntoConstraints=false
         collection.anchorWithConstantsToTop(header.bottomAnchor, left: self.view.leftAnchor, bottom: self.view.bottomAnchor, right: self.view.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0)
         collection.backgroundColor=UIColor.clear
+        collection.isPagingEnabled=true
         setup()
         load()
+        setup_menu()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.setBG()
+    }
+    
+    let menuBtn=UIBarButtonItem()
+    func open(_ sender: Any) {
+        self.slideMenuController()?.toggleLeft()
+    }
+    func setup_menu(){
+        let lBtn = UIButton()
+        lBtn.setImage(#imageLiteral(resourceName: "menu"), for: .normal)
+        lBtn.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+        lBtn.addTarget(self, action: #selector(open), for: .touchUpInside)
+        menuBtn.customView=lBtn
+        self.navigationItem.setLeftBarButtonItems([menuBtn], animated: false)
+    }
+    
     func load(){
         CustomRequests.getPhoto(view: self, loading: loadingView){
             response in
@@ -127,12 +146,16 @@ class MediaViewController: UIViewController {
     func setSelected(sender:UIButton){
         if sender.tag==0{
             logBtn.isSelected=true
-            regBtn.isSelected=false
+            UIView.animate(withDuration: 4.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+                 self.regBtn.isSelected=false
+            }, completion: nil)
             collection.setContentOffset(CGPoint.zero, animated: true)
         }else{
-            logBtn.isSelected=false
             regBtn.isSelected=true
-            collection.setContentOffset(CGPoint(x:UIScreen.main.bounds.width, y: 0), animated: true)
+            UIView.animate(withDuration: 4.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+                self.logBtn.isSelected=false
+            }, completion: nil)
+            collection.setContentOffset(CGPoint(x:UIScreen.main.bounds.width+10, y: 0), animated: true)
         }
     }
     
@@ -144,7 +167,9 @@ class MediaViewController: UIViewController {
             logBtn.isSelected=false
         }else{
             logBtn.isSelected=true
-            regBtn.isSelected=false
+            UIView.animate(withDuration: 4.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+                self.regBtn.isSelected=false
+            }, completion: nil)
         }
     }
     
@@ -153,8 +178,14 @@ class MediaViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func open(_ sender: Any) {
-        self.slideMenuController()?.toggleLeft()
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let backItem = UIBarButtonItem()
+        backItem.title = ""
+        navigationItem.backBarButtonItem = backItem
+        if segue.identifier=="detail"{
+            let dc=segue.destination as! MediaDetailViewController
+            dc.message=sender as! JSON
+        }
     }
 }
 
@@ -207,7 +238,7 @@ class PhotoCell:UICollectionViewCell,UITableViewDelegate,UITableViewDataSource{
         table.reloadData()
     }
     func numberOfSections(in tableView: UITableView) -> Int {
-        if message == nil{
+        if message.count==0{
             return 1
         }
         return (message.array?.count)!
@@ -216,14 +247,14 @@ class PhotoCell:UICollectionViewCell,UITableViewDelegate,UITableViewDataSource{
         return 1
     }
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if message == nil{
+      if message.count==0{
             cell.backgroundColor=UIColor.white
         }else{
             cell.backgroundColor=UIColor.clear
         }
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if message == nil{
+        if message.count==0{
             return 70
         }
         return 200
@@ -243,8 +274,10 @@ class PhotoCell:UICollectionViewCell,UITableViewDelegate,UITableViewDataSource{
                         return INSPhoto(imageURL: URL.init(string: output), thumbnailImageURL: URL.init(string: output))
                     }
                     if (galery.count)>0{
+                        UIApplication.shared.isStatusBarHidden=true
                         let galleryPreview = INSPhotosViewController(photos: galery, initialPhoto: galery[0], referenceView: self)
                         galleryPreview.referenceViewForPhotoWhenDismissingHandler = { [weak self] photo in
+                            UIApplication.shared.isStatusBarHidden=false
                             if (galery.index(where: {$0 === photo})) != nil {
                                 return self
                             }
@@ -258,7 +291,7 @@ class PhotoCell:UICollectionViewCell,UITableViewDelegate,UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if message == nil{
+        if message.count==0{
             let cell=tableView.dequeueReusableCell(withIdentifier: "empty", for: indexPath)
             return cell
         }
@@ -270,24 +303,20 @@ class PhotoCell:UICollectionViewCell,UITableViewDelegate,UITableViewDataSource{
             cell.img.kf.indicatorType = .activity
             UIImageView().kf.setImage(with: URL.init(string: thumb),options: [], completionHandler: {
                 (image, error, cacheType, imageUrl) in
-                let size=image?.size
-                let w=200*(size?.width)!/(size?.height)!
-                let processor = ResizingImageProcessor(targetSize: CGSize(width: w, height: 200))
-                cell.img.kf.setImage(with: imageUrl,options: [.processor(processor)])
+                if image != nil{
+                    let size=image?.size
+                    let w=200*(size?.width)!/(size?.height)!
+                    let processor = ResizingImageProcessor(targetSize: CGSize(width: w, height: 200))
+                    cell.img.image=image
+                    //cell.img.kf.setImage(with: imageUrl,options: [.processor(processor)])
+                }
             })
         }
         if let count=m["count"].string{
-            let fullString = NSMutableAttributedString(string: "")
-            let image1Attachment = NSTextAttachment()
-            image1Attachment.image = #imageLiteral(resourceName: "foto")
-            image1Attachment.bounds=CGRect(x: 0, y: 0, width: 15, height: 12)
-            let image1String = NSAttributedString(attachment: image1Attachment)
-            fullString.append(image1String)
-            fullString.append(NSAttributedString(string: " \(count)"))
-            cell.count.attributedText=fullString
+            cell.count.text=count
         }
         if let name=m["name"].string{
-            cell.title.text=name
+            cell.title.text=name.uppercased()
         }
         
         return cell
@@ -315,23 +344,23 @@ class VideoCell:UICollectionViewCell,UITableViewDelegate,UITableViewDataSource{
         table.backgroundColor=UIColor.clear
     }
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if message == nil{
+        if message.count==0{
             return 1
         }
         return (message.array?.count)!
     }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+    }
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if message == nil{
+        if message.count==0{
             cell.backgroundColor=UIColor.white
         }else{
             cell.backgroundColor=UIColor.clear
         }
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if message == nil{
+       if message.count==0{
             return 70
         }
         return 200
@@ -342,30 +371,72 @@ class VideoCell:UICollectionViewCell,UITableViewDelegate,UITableViewDataSource{
             CustomRequests.getAlbum(view: parent!, loading: loading!, id: id){
                 response in
                 if response != nil{
-                    if let url=response["items"][0]["src"].string{
-                        UIApplication.shared.open(URL.init(string: url)!, options: [:], completionHandler: nil)
-                    }
+                    self.parent?.performSegue(withIdentifier: "detail", sender: response)
+//                    let galery=response["items"].arrayValue.filter({$0["type"].stringValue=="2"}).map{
+//                        (item)->CustomVideoModel in
+//                        var output=""
+//                        if let thumb=item["thumb"].string{
+//                            output=thumb
+//                        }
+//                        var src=""
+//                        if let s=item["src"].string{
+//                            src=s
+//                        }
+//                        return CustomVideoModel(imageURL: URL.init(string: output), thumbnailImageURL: URL.init(string: output),videoURL:src)
+//                    }
+//                    if (galery.count)>0{
+//                        UIApplication.shared.isStatusBarHidden=true
+//                        let galleryPreview = INSPhotosViewController(photos: galery, initialPhoto: galery[0], referenceView: self)
+//                        galleryPreview.overlayView=CustomOverlay(frame: CGRect.zero)
+//                        (galleryPreview.overlayView as? CustomOverlay)?.currentPhoto=galery[0]
+//                        galleryPreview.referenceViewForPhotoWhenDismissingHandler = { [weak self] photo in
+//                            UIApplication.shared.isStatusBarHidden=false
+//                            if (galery.index(where: {$0 === photo})) != nil {
+//                                return self
+//                            }
+//                            return nil
+//                        }
+//                        self.parent?.present(galleryPreview, animated: true, completion: nil)
+//                    }
                 }
             }
         }
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if message == nil{
+        if message.count==0{
             let cell=tableView.dequeueReusableCell(withIdentifier: "empty", for: indexPath)
             return cell
         }
         let cell=tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MediaCell
         cell.video_img.isHidden=false
-        cell.count.isHidden=true
-        let m=message[indexPath.row]
+        let m=message[indexPath.section]
         if let thumb=m["thumb"].string{
-            cell.img.kf.setImage(with: URL.init(string: thumb))
+            cell.img.kf.indicatorType = .activity
+            UIImageView().kf.setImage(with: URL.init(string: thumb),options: [], completionHandler: {
+                (image, error, cacheType, imageUrl) in
+                if image != nil{
+                    let size=image?.size
+                    let w=200*(size?.width)!/(size?.height)!
+                    let processor = ResizingImageProcessor(targetSize: CGSize(width: w, height: 200))
+                    cell.img.image=image
+                    //cell.img.kf.setImage(with: imageUrl,options: [.processor(processor)])
+                }
+            })
         }
         if let name=m["name"].string{
-            cell.title.text=name
+            cell.title.text=name.uppercased()
         }
         
         return cell
+    }
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 10
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let view=UIView()
+        view.backgroundColor=UIColor.clear
+        return view
     }
 }
 

@@ -11,10 +11,12 @@ import UIKit
 class SettingsViewController: UIViewController {
     
     @IBOutlet weak var fon: UIImageView!
+    @IBOutlet weak var top: NSLayoutConstraint!
     @IBOutlet weak var table: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title="НАСТРОЙКИ"
+        self.navigationController?.navigationBar.titleTextAttributes = [ NSForegroundColorAttributeName: UIColor.white,NSFontAttributeName: UIFont(name: "CenturyGothic-Bold", size: 24)!]
         self.navigationController?.setBG()
         view.backgroundColor=UIColor(colorLiteralRed: 0, green: 0, blue: 19/255, alpha: 1)
         fon.image=#imageLiteral(resourceName: "Kaitrat").imageByCroppingImage(size: CGSize(width: 1000, height: 1000))
@@ -26,15 +28,25 @@ class SettingsViewController: UIViewController {
         table.separatorStyle = .none
         table.rowHeight=70
         table.estimatedRowHeight=UITableViewAutomaticDimension
+        setup_menu()
+    }
+    
+    let menuBtn=UIBarButtonItem()
+    func open(_ sender: Any) {
+        self.slideMenuController()?.toggleLeft()
+    }
+    func setup_menu(){
+        let lBtn = UIButton()
+        lBtn.setImage(#imageLiteral(resourceName: "menu"), for: .normal)
+        lBtn.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+        lBtn.addTarget(self, action: #selector(open), for: .touchUpInside)
+        menuBtn.customView=lBtn
+        self.navigationItem.setLeftBarButtonItems([menuBtn], animated: false)
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }
-    
-    @IBAction func open(_ sender: Any) {
-        self.slideMenuController()?.toggleLeft()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -113,7 +125,7 @@ extension SettingsViewController:UITableViewDelegate{
             performSegue(withIdentifier: "showAuth", sender: self)
             break
         case 1:
-            UIApplication.shared.open(URL.init(string: "")!, options: [:], completionHandler: nil)
+             UIApplication.shared.openURL(URL.init(string: "")!)
             break
         default:
             break
@@ -147,11 +159,10 @@ class SettingsCell: UITableViewCell {
         self.accessoryType = .disclosureIndicator
         self.tintColor=UIColor.white
         self.textLabel?.textColor=UIColor.white
-        self.detailTextLabel?.textColor=UIColor.gray
+        self.detailTextLabel?.textColor=UIColor(colorLiteralRed: 109/255, green: 105/255, blue: 126/255, alpha: 1)
         self.detailTextLabel?.numberOfLines=0
-        self.detailTextLabel?.font=UIFont(name: "Century Gothic", size: 11)
-        
-        self.imageView?.frame=CGRect(x: 15, y: 15, width: 45, height: 45)
+        self.detailTextLabel?.font=UIFont(name: "OpenSans-Light", size: 12)
+        self.imageView?.frame=CGRect(x: 15, y: 20, width: 45, height: 45)
         self.textLabel?.frame.origin=CGPoint(x: 70, y: 15)
         self.detailTextLabel?.frame.origin=CGPoint(x: 70, y: 20+Int((self.textLabel?.bounds.height)!))
     }
